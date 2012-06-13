@@ -6,20 +6,32 @@ Created on 12/06/2012
 @author: Andrés Javier López <ajavier.lopez@gmail.com>
 @version: 1.0
 '''
+import json
 
 class RestObject(object):
     def __init__(self):
         pass
     
     def GET(self):
-        return ''
+        return json.dumps(self.read())
     
     def POST(self):
-        return ''
+        return json.dumps(self.insert())
     
     def PUT(self):
-        return ''
+        return json.dumps(self.replace())
     
     def DELETE(self):
-        return ''
+        return json.dumps(self.delete())
     
+    def read(self):
+        pass
+    
+    def insert(self):
+        pass
+    
+    def replace(self):
+        pass
+    
+    def delete(self):
+        pass

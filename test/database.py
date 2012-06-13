@@ -10,16 +10,14 @@ import pyros.restobject
 import pyros.database
 import config
 
+config.check_database()
+
 class TestModel(pyros.database.Model):
     def __init__(self):
-        super(TestModel, self).__init__('test', ['valor1_test', 'valor2_test'])
-        pass 
+        super(TestModel, self).__init__('test', ['valor1_test', 'valor2_test']) 
 
 class Test(pyros.restobject.RestObject):
-    def GET(self):
+    def read(self):
         model = TestModel()
         results = model.list_all()
-        string = ''
-        for data in results:
-            string += 'valor1: ' + data.valor1_test.__str__() + ' valor2: ' + data.valor2_test
-        return string
+        return results
