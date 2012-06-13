@@ -14,4 +14,11 @@ database = {'dbn': 'mysql', 'user': 'root', 'password': '', 'database': 'pyros_t
 
 debug = True
 
-pyros.database.Database.initialize(database)
+def init_connection():
+    pyros.database.Database.initialize(database)
+    
+def check_database():
+    if(pyros.database.check_connection() == False):
+        init_connection()
+    
+init_connection()

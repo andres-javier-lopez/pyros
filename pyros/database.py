@@ -8,6 +8,12 @@ Created on 13/06/2012
 '''
 import web
 
+def check_connection():
+    if(Database.main == None):
+        return False
+    else:
+        return True
+
 class DatabaseError(Exception):
     pass
 
@@ -41,7 +47,11 @@ class Model(object):
             fields = '*'
         else:
             fields = web.db.sqllist(self.fields)
-        return self.db.select(self.table, what = fields, where = where, order = order, _test = self._test )        
+        result = self.db.select(self.table, what = fields, where = where, order = order, _test = self._test )
+        rows = []
+        for data in result:
+            rows.append(data)
+        return rows        
     
     def get(self, id):
         pass
