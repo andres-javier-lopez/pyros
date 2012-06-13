@@ -11,9 +11,9 @@ Created on 12/06/2012
 import sys, os
 sys.path.append(os.getcwd())
 
-import pyros.app
+import web
+from app.config import debug, urls
 
-urls = ()
-
-app = pyros.app.App(urls)
-application = app.load()
+web.config.debug = debug
+app = web.application(urls, globals())
+application = app.wsgifunc()

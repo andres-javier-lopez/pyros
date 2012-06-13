@@ -8,11 +8,10 @@ Created on 12/06/2012
 @version: 1.0
 '''
 
-import pyros.app
+import web
+from app.config import debug, urls
 
-urls = ()
-
-app = pyros.app.App(urls)
-
-if __name__ == "__main__": 
+if __name__ == '__main__':
+    web.config.debug = debug
+    app = web.application(urls, globals())
     app.run()
