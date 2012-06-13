@@ -71,4 +71,13 @@ class Dataset(object):
         pass
         
 class Datamap(object):
-    pass
+    def __init__(self, tables):
+        self.tables = tables
+       
+    def read(self):
+        if(len(self.tables) > 1):
+            return 'join query'
+        else:
+            model = Model(self.tables.pop())
+            return model.list_all()
+        

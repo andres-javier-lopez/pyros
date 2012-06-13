@@ -9,9 +9,6 @@ Created on 12/06/2012
 import json
 
 class RestObject(object):
-    def __init__(self):
-        pass
-    
     def GET(self):
         return json.dumps(self.read())
     

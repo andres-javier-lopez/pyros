@@ -10,14 +10,10 @@ import pyros.restobject
 import pyros.database
 import config
 
-config.check_database()
-
-class TestModel(pyros.database.Model):
-    def __init__(self):
-        super(TestModel, self).__init__('test', ['valor1_test', 'valor2_test']) 
-
 class Test(pyros.restobject.RestObject):
+    def __init__(self):
+        config.check_database()
+        
     def read(self):
-        model = TestModel()
-        results = model.list_all()
-        return results
+        datamap = pyros.database.Datamap(['test'])
+        return datamap.read()
