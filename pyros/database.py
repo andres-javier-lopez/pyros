@@ -71,20 +71,25 @@ class Dataset(object):
         pass
         
 class Datamap(object):
-    def __init__(self, table):
+    def __init__(self, table, where=None):
         self.table = table
+        self.where = where
         self.joins = []
         
-    def addJoin(self, table, join_field = None):
-        self.joins.append({'table': table, 'join_field': join_field})
+    def add_join(self, datamap, join_field = None):
+        self.joins.append({'datamap': datamap, 'join_field': join_field})
+    
+    def add_where(self, where):
+        self.where = where
        
     def read(self):
         model = Model(self.table)
-        main_list = model.list_all()
+        main_list = model.list_all(where=self.where)
         for element in main_list:
             for sub in self.joins:
-                sub_model = Model(sub['table'])
+                submap = sub['datamap']
                 where = sub['join_field'] + ' = ' + getattr(element, sub['join_field']).__str__()
-                setattr(element, sub['table'], sub_model.list_all(where=where))
+                submap.add_where(where)
+                setattr(element, submap.table, submap.read())
         return main_list
         
