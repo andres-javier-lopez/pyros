@@ -76,8 +76,12 @@ class Datamap(object):
         self.where = where
         self.joins = []
         
-    def add_join(self, datamap, join_field = None):
-        self.joins.append({'datamap': datamap, 'join_field': join_field})
+    def add_join(self, datamap, join_field = None, tag = None):
+        if(not isinstance(datamap, Datamap)):
+            raise DatabaseError(u'Se agregó un objeto diferente de Datamap al join')
+        if(tag is None):
+            tag = datamap.table
+        self.joins.append({'datamap': datamap, 'tag': tag, 'join_field': join_field})
     
     def add_where(self, where):
         self.where = where
@@ -90,6 +94,6 @@ class Datamap(object):
                 submap = sub['datamap']
                 where = sub['join_field'] + ' = ' + getattr(element, sub['join_field']).__str__()
                 submap.add_where(where)
-                setattr(element, submap.table, submap.read())
+                setattr(element, sub['tag'], submap.read())
         return main_list
         
