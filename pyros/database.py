@@ -53,7 +53,7 @@ class Model(object):
             rows.append(data)
         return rows        
     
-    def get(self, id):
+    def get(self, id_data):
         pass
     
     def insert(self, dataset):
@@ -62,7 +62,7 @@ class Model(object):
     def update(self, dataset):
         pass
     
-    def delete(self, id):
+    def delete(self, id_data):
         pass
     
 
@@ -71,10 +71,11 @@ class Dataset(object):
         pass
         
 class Datamap(object):
-    def __init__(self, table, where=None):
+    def __init__(self, table, fields=[], where=None):
         self.table = table
         self.where = where
         self.joins = []
+        self.fields = fields
         
     def add_join(self, datamap, join_field = None, tag = None):
         if(not isinstance(datamap, Datamap)):
@@ -87,7 +88,7 @@ class Datamap(object):
         self.where = where
        
     def read(self):
-        model = Model(self.table)
+        model = Model(self.table, self.fields)
         main_list = model.list_all(where=self.where)
         for element in main_list:
             for sub in self.joins:
