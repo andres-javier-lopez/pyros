@@ -15,5 +15,6 @@ class Test(pyros.restobject.RestObject):
         config.check_database()
         
     def read(self):
-        datamap = pyros.database.Datamap(['test'])
+        datamap = pyros.database.Datamap('test')
+        datamap.addJoin('test2', 'id_test')
         return datamap.read()
