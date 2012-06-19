@@ -9,6 +9,7 @@ Created on 13/06/2012
 import pyros.restobject
 import pyros.database
 import config
+import web
 
 class Test(pyros.restobject.RestObject):
     def __init__(self):
@@ -24,3 +25,8 @@ class Test(pyros.restobject.RestObject):
         datamap.add_join(test2, 'id_test', 'subtest')
         
         return datamap.read()
+    
+    def insert(self):
+        data = pyros.database.Dataset(web.data(), ['valor1_test', 'valor2_test'])
+        result = data.insertTo('test')
+        return {'success': result}

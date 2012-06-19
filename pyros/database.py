@@ -7,6 +7,7 @@ Created on 13/06/2012
 @version: 1.0
 '''
 import web
+import json
 
 def check_connection():
     if(Database.main == None):
@@ -15,6 +16,9 @@ def check_connection():
         return True
 
 class DatabaseError(Exception):
+    pass
+
+class DatasetError(DatabaseError):
     pass
 
 class Database(object):
@@ -56,8 +60,12 @@ class Model(object):
     def get(self, id_data):
         pass
     
-    def insert(self, dataset):
-        pass
+    def insert(self, values):
+        vals = []
+        for key  in values.keys():
+            vals.append( '$'+key )
+        query = 'INSERT INTO ' + self.table + ' (' + web.db.sqllist(values.keys()) + ') VALUES (' + web.db.sqllist(vals) + ')'
+        self.db.query(query, vars=values, _test = self._test)
     
     def update(self, dataset):
         pass
@@ -67,8 +75,30 @@ class Model(object):
     
 
 class Dataset(object):
-    def __init__(self):
-        pass
+    def __init__(self, data, fields, index=None):
+        try:
+            self.json_data = json.loads(data)
+        except ValueError:
+            self.json_data = {}
+            raise DatasetError('No se pudo decodificar el JSON')
+            
+        if(index == None):
+            data = self.json_data
+        else:
+            data = self.json_data[index]
+        
+        self.fields = fields
+        self.values = {}
+        for field in self.fields:
+            try:
+                self.values[field] = data[field]
+            except KeyError:
+                raise DatasetError('El campo ' + field + ' no fue proporcionado')
+        
+    def insertTo(self, table):
+        model = Model(table, self.fields)
+        model.insert(self.values)
+        return True
         
 class Datamap(object):
     def __init__(self, table, fields=[], where=None):
