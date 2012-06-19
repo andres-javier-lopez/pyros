@@ -96,5 +96,5 @@ class Datamap(object):
                 where = sub['join_field'] + ' = ' + getattr(element, sub['join_field']).__str__()
                 submap.add_where(where)
                 setattr(element, sub['tag'], submap.read())
-        return main_list
+        return {'data': main_list}
         
