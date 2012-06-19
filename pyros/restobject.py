@@ -6,20 +6,25 @@ Created on 12/06/2012
 @author: Andrés Javier López <ajavier.lopez@gmail.com>
 @version: 1.0
 '''
+import web
 import json
 
 class RestObject(object):
     def GET(self):
-        return json.dumps(self.read())
+        return self.response(self.read())
     
     def POST(self):
-        return json.dumps(self.insert())
+        return self.response(self.insert())
     
     def PUT(self):
-        return json.dumps(self.replace())
+        return self.response(self.replace())
     
     def DELETE(self):
-        return json.dumps(self.delete())
+        return self.response(self.delete())
+    
+    def response(self, data):
+        web.header('Content-Type', 'application/json')
+        return json.dumps(data)
     
     def read(self):
         pass
