@@ -41,6 +41,12 @@ class RestObject(object):
     def _prepareId(self, string):
         return string.replace('/', '')
     
+    def _respSuccess(self, result):
+        return self._resp('success', result)
+    
+    def _resp(self, tag, data):
+        return {tag: data}
+    
     def read(self):
         pass
     
