@@ -66,7 +66,10 @@ class Model(object):
             fields = web.db.sqllist(self.fields)
         where = 'id_' + self.table + ' = ' + id_data
         result = self.db.select(self.table, what = fields, where = where, _test = self._test )
-        return result[0]        
+        if(len(result) == 1):
+            return result[0]
+        else:
+            return {}
     
     def insert(self, values):
         vals = []
@@ -172,10 +175,11 @@ class Datamap(object):
     
     def getElement(self, id_element):
         data = self.model.get(id_element)
-        for sub in self.joins:
-            submap = sub['datamap']
-            where = sub['join_field'] + ' = ' + getattr(data, sub['join_field']).__str__()
-            submap.add_where(where)
-            setattr(data, sub['tag'], submap.read())
+        if(data != {}):
+            for sub in self.joins:
+                submap = sub['datamap']
+                where = sub['join_field'] + ' = ' + getattr(data, sub['join_field']).__str__()
+                submap.add_where(where)
+                setattr(data, sub['tag'], submap.read())
         return data
         
