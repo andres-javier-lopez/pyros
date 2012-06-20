@@ -58,7 +58,15 @@ class Model(object):
         return rows        
     
     def get(self, id_data):
-        pass
+        if(self.table == None):
+            raise DatabaseError(u'No se definió una tabla en el modelo')
+        if(self.fields == []):
+            fields = '*'
+        else:
+            fields = web.db.sqllist(self.fields)
+        where = 'id_' + self.table + ' = ' + id_data
+        result = self.db.select(self.table, what = fields, where = where, _test = self._test )
+        return result[0]        
     
     def insert(self, values):
         vals = []
@@ -67,37 +75,66 @@ class Model(object):
         query = 'INSERT INTO ' + self.table + ' (' + web.db.sqllist(values.keys()) + ') VALUES (' + web.db.sqllist(vals) + ')'
         self.db.query(query, vars=values, _test = self._test)
     
-    def update(self, dataset):
-        pass
+    def update(self, id, values):
+        vals = []
+        for key  in values.keys():
+            vals.append( key +' = $'+key )
+        query = 'UPDATE ' + self.table + ' SET ' + web.db.sqllist(vals.keys()) + ' WHERE `id_' + self.table + '` = ' + id
+        print query 
+        #self.db.query(query, vars=values, _test = self._test)
     
     def delete(self, id_data):
         pass
     
 
 class Dataset(object):
-    def __init__(self, data, fields, index=None):
-        try:
-            self.json_data = json.loads(data)
-        except ValueError:
-            self.json_data = {}
-            raise DatasetError('No se pudo decodificar el JSON')
-            
-        if(index == None):
-            data = self.json_data
-        else:
-            data = self.json_data[index]
-        
+    def __init__(self, fields, json_data=None, index=None):
         self.fields = fields
         self.values = {}
+                
+        if(not json_data is None):
+            try:
+                self.json_data = json.loads(json_data)
+            except ValueError:
+                self.json_data = {}
+                raise DatasetError(u'No se pudo decodificar el JSON')
+            
+            if(index == None):
+                self._loadData(self.json_data)
+            else:
+                self._loadData(self.json_data[index])            
+        else:
+            self.json_data = {}
+    
+    def _loadData(self, data):
         for field in self.fields:
             try:
                 self.values[field] = data[field]
             except KeyError:
-                raise DatasetError('El campo ' + field + ' no fue proporcionado')
+                raise DatasetError(u'El campo ' + field + ' no fue proporcionado')
+            
+    def _readData(self):
+        return self.values
+            
+    def getFrom(self, table, id_data):
+        model = Model(table, self.fields)
+        data = model.get(id_data)
+        self._loadData(data)
+        return self._readData()
         
     def insertTo(self, table):
+        if(len(self.values) == 0):
+            raise DatasetError(u'Dataset vacío')
+        
         model = Model(table, self.fields)
         model.insert(self.values)
+        return True
+    
+    def updateIn(self, table, id_data):
+        if(len(self.values) == 0):
+            raise DatasetError(u'Dataset vacío')
+        model = Model(table, self.fields)
+        model.update(id_data, self.values)
         return True
         
 class Datamap(object):

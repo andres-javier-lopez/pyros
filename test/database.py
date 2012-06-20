@@ -11,6 +11,8 @@ import pyros.database
 import config
 import web
 
+fields_test = ['valor1_test', 'valor2_test']
+
 class Test(pyros.restobject.RestObject):
     def __init__(self):
         config.check_database()
@@ -27,6 +29,10 @@ class Test(pyros.restobject.RestObject):
         return datamap.read()
     
     def insert(self):
-        data = pyros.database.Dataset(web.data(), ['valor1_test', 'valor2_test'])
+        data = pyros.database.Dataset(fields_test, json_data=web.data())
         result = data.insertTo('test')
         return {'success': result}
+    
+    def getElement(self, id_element):
+        data = pyros.database.Dataset(fields_test)
+        return data.getFrom('test', id_element)
