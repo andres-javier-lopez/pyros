@@ -34,3 +34,9 @@ class Test(pyros.restobject.RestObject):
     
     def getElement(self, id_element):
         return {'elemento': self.datamap.getElement(id_element)}
+    
+    def updateElement(self, id_element):
+        data = pyros.database.Dataset(self.fields_test)
+        result = data.updateIn('test', id_element, web.data())
+        return {'success': result}
+        

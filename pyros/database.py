@@ -10,7 +10,7 @@ import web
 import json
 
 def check_connection():
-    if(Database.main == None):
+    if(Database.main is None):
         return False
     else:
         return True
@@ -36,7 +36,7 @@ class Database(object):
     
 class Model(object):
     def __init__(self, table, fields = [], _test = False):
-        if(Database.main != None):
+        if(Database.main is not None):
             self.db = Database.main.get_connection()
         else:
             raise DatabaseError(u'No esta definida una conexión con la base de datos')
@@ -45,7 +45,7 @@ class Model(object):
         self._test = _test
         
     def list_all(self, where = None, order = None):
-        if(self.table == None):
+        if(self.table is None):
             raise DatabaseError(u'No se definió una tabla en el modelo')
         if(self.fields == []):
             fields = '*'
@@ -58,7 +58,7 @@ class Model(object):
         return rows        
     
     def get(self, id_data):
-        if(self.table == None):
+        if(self.table is None):
             raise DatabaseError(u'No se definió una tabla en el modelo')
         if(self.fields == []):
             fields = '*'
@@ -75,13 +75,12 @@ class Model(object):
         query = 'INSERT INTO ' + self.table + ' (' + web.db.sqllist(values.keys()) + ') VALUES (' + web.db.sqllist(vals) + ')'
         self.db.query(query, vars=values, _test = self._test)
     
-    def update(self, id, values):
+    def update(self, id_data, values):
         vals = []
         for key  in values.keys():
             vals.append( key +' = $'+key )
-        query = 'UPDATE ' + self.table + ' SET ' + web.db.sqllist(vals.keys()) + ' WHERE `id_' + self.table + '` = ' + id
-        print query 
-        #self.db.query(query, vars=values, _test = self._test)
+        query = 'UPDATE ' + self.table + ' SET ' + web.db.sqllist(vals) + ' WHERE `id_' + self.table + '` = ' + id_data
+        self.db.query(query, vars=values, _test = self._test)
     
     def delete(self, id_data):
         pass
@@ -92,26 +91,30 @@ class Dataset(object):
         self.fields = fields
         self.values = {}
                 
-        if(not json_data is None):
-            try:
-                self.json_data = json.loads(json_data)
-            except ValueError:
-                self.json_data = {}
-                raise DatasetError(u'No se pudo decodificar el JSON')
-            
-            if(index == None):
-                self._loadData(self.json_data)
-            else:
-                self._loadData(self.json_data[index])            
+        if(json_data is not None):
+            self._loadJSON(json_data, index)
         else:
             self.json_data = {}
     
-    def _loadData(self, data):
+    def _loadJSON(self, json_data, index=None, strict=True):
+        try:
+            self.json_data = json.loads(json_data)
+        except ValueError:
+            self.json_data = {}
+            raise DatasetError(u'No se pudo decodificar el JSON')
+            
+        if(index is None):
+            self._loadData(self.json_data, strict)
+        else:
+            self._loadData(self.json_data[index], strict)
+    
+    def _loadData(self, data, strict=True):
         for field in self.fields:
             try:
                 self.values[field] = data[field]
             except KeyError:
-                raise DatasetError(u'El campo ' + field + ' no fue proporcionado')
+                if(strict is True):
+                    raise DatasetError(u'El campo ' + field + ' no fue proporcionado')
             
     def _readData(self):
         return self.values
@@ -130,9 +133,10 @@ class Dataset(object):
         model.insert(self.values)
         return True
     
-    def updateIn(self, table, id_data):
+    def updateIn(self, table, id_data, data):
         if(len(self.values) == 0):
-            raise DatasetError(u'Dataset vacío')
+            self.getFrom(table, id_data)
+        self._loadJSON(data, strict=False)
         model = Model(table, self.fields)
         model.update(id_data, self.values)
         return True
