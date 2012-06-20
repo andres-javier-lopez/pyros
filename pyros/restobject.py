@@ -4,7 +4,7 @@
 Created on 12/06/2012
 
 @author: Andrés Javier López <ajavier.lopez@gmail.com>
-@version: 1.0
+@version: 0.5
 '''
 import web
 import json
@@ -18,7 +18,7 @@ class RestObject(object):
                 return self._response(self.read())
             else:
                 return self._response(self.getElement(self._prepareId(element)))
-        except:
+        except Exception:
             return self._response(self._respError())
     
     def POST(self, element=None):
@@ -28,7 +28,7 @@ class RestObject(object):
                 return self._response(self.insert())
             else:
                 return self._response(self.insertInto(self._prepareId(element)))
-        except:
+        except Exception:
             return self._response(self._respError())
     
     def PUT(self, element=None):
@@ -38,7 +38,7 @@ class RestObject(object):
                 return self._response(self.replace())
             else:
                 return self._response(self.updateElement(self._prepareId(element)))
-        except:
+        except Exception:
             return self._response(self._respError())
     
     def DELETE(self, element=None):
@@ -48,7 +48,7 @@ class RestObject(object):
                 return self._response(self.delete())
             else:
                 return self._response(self.deleteElement(self._prepareId(element)))
-        except:
+        except Exception:
             return self._response(self._respError())
     
     def _response(self, data):
