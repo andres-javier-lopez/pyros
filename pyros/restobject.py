@@ -11,32 +11,35 @@ import json
 
 class RestObject(object):
     def GET(self, element=None):
-        if(element is None):
-            return self.response(self.read())
+        if(element is None or element == '/'):
+            return self._response(self.read())
         else:
-            return self.response(self.getElement(element))
+            return self._response(self.getElement(self._prepareId(element)))
     
     def POST(self, element=None):
-        if(element is None):
-            return self.response(self.insert())
+        if(element is None or element == '/'):
+            return self._response(self.insert())
         else:
-            return self.response(self.insertInto(element))
+            return self._response(self.insertInto(self._prepareId(element)))
     
     def PUT(self, element=None):
-        if(element is None):
-            return self.response(self.replace())
+        if(element is None or element == '/'):
+            return self._response(self.replace())
         else:
-            return self.response(self.updateElement(element))
+            return self._response(self.updateElement(self._prepareId(element)))
     
     def DELETE(self, element=None):
-        if(element is None):
-            return self.response(self.delete())
+        if(element is None or element == '/'):
+            return self._response(self.delete())
         else:
-            return self.response(self.deleteElement(element))
+            return self._response(self.deleteElement(self._prepareId(element)))
     
-    def response(self, data):
+    def _response(self, data):
         web.header('Content-Type', 'application/json')
         return json.dumps(data)
+    
+    def _prepareId(self, string):
+        return string.replace('/', '')
     
     def read(self):
         pass
