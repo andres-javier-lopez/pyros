@@ -83,7 +83,8 @@ class Model(object):
         self.db.query(query, vars=values, _test = self._test)
     
     def delete(self, id_data):
-        pass
+        where = 'id_' + self.table + ' = $id_data'
+        self.db.delete(self.table, where=where, vars={'id_data': id_data})
     
 
 class Dataset(object):

@@ -39,4 +39,8 @@ class Test(pyros.restobject.RestObject):
         data = pyros.database.Dataset(self.fields_test)
         result = data.updateIn('test', id_element, web.data())
         return {'success': result}
+    
+    def deleteElement(self, id_element):
+        pyros.database.Model('test').delete(id_element)
+        return {'success': True}
         
