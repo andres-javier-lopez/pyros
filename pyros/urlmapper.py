@@ -17,7 +17,7 @@ class URL(object):
         '''Agrega un nuevo par ruta/manejador al mapa de rutas'''
         self.routemap = self.routemap + (route + '(/\d*)?', handler)
     
-    def getMap(self):
+    def get_map(self):
         '''Devuelve el mapa de rutas'''
         return self.routemap
         

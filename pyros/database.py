@@ -112,11 +112,11 @@ class Dataset(object):
         self.values = {}
                 
         if(json_data is not None):
-            self._loadJSON(json_data, index)
+            self._load_JSON(json_data, index)
         else:
             self.json_data = {}
     
-    def _loadJSON(self, json_data, index=None, strict=True):
+    def _load_JSON(self, json_data, index=None, strict=True):
         '''Obtiene datos del registro proporcionados en formato JSON'''
         try:
             self.json_data = json.loads(json_data)
@@ -125,36 +125,36 @@ class Dataset(object):
             raise DatasetError(u'No se pudo decodificar el JSON')
             
         if(index is None):
-            self._loadData(self.json_data, strict)
+            self._load_data(self.json_data, strict)
         else:
-            self._loadData(self.json_data[index], strict)
+            self._load_data(self.json_data[index], strict)
     
-    def _loadData(self, data, strict=True):
+    def _load_data(self, data, strict=True):
         '''Obtiene datos del registro proporcionados en un diccionario'''
         for field in self.fields:
             try:
                 self.values[field] = data[field]
             except KeyError:
-                if(strict is True):
+                if(strict):
                     raise DatasetError(u'El campo ' + field + ' no fue proporcionado')
             
-    def _readData(self):
+    def _read_data(self):
         '''Devuelve la lista de campos y datos correspondiente al registro'''
         return self.values
     
-    def addField(self, field, value):
+    def add_field(self, field, value):
         '''Agrega un nuevo campo al registro'''
         self.fields.append(field)
         self.values[field] = value
             
-    def getFrom(self, table, id_data):
+    def get_from(self, table, id_data):
         '''Carga la información del registro proporcionado'''
         model = Model(table, self.fields)
         data = model.get(id_data)
-        self._loadData(data)
-        return self._readData()
+        self._load_data(data)
+        return self._read_data()
         
-    def insertTo(self, table):
+    def insert_to(self, table):
         '''Inserta el registro a la tabla proporcionada'''
         if(len(self.values) == 0):
             raise DatasetError(u'Dataset vacío')
@@ -163,11 +163,11 @@ class Dataset(object):
         model.insert(self.values)
         return True
     
-    def updateIn(self, table, id_data, data):
+    def update_in(self, table, id_data, data):
         '''Actualiza el registro en la tabla proporcionada'''
         if(len(self.values) == 0):
-            self.getFrom(table, id_data)
-        self._loadJSON(data, strict=False)
+            self.get_from(table, id_data)
+        self._load_JSON(data, strict=False)
         model = Model(table, self.fields)
         model.update(id_data, self.values)
         return True
@@ -205,7 +205,7 @@ class Datamap(object):
                 setattr(element, sub['tag'], submap.read())
         return main_list
     
-    def getElement(self, id_element):
+    def get_element(self, id_element):
         '''Devuelve un único elemento en el mapa con el id proporcionado'''
         data = self.model.get(id_element)
         if(data != {}):

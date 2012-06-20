@@ -17,9 +17,10 @@ class RestObject(object):
             if(element is None or element == '/'):
                 return self._response(self.read())
             else:
-                return self._response(self.getElement(self._prepareId(element)))
-        except Exception:
-            return self._response(self._respError())
+                return self._response(self.get_element(self._prepare_id(element)))
+        except Exception as e:
+            return self._response(self._resp_error(e.__str__()))
+            pass
     
     def POST(self, element=None):
         '''Devuelve la respuesta al método POST del protocolo HTTP'''
@@ -27,9 +28,10 @@ class RestObject(object):
             if(element is None or element == '/'):
                 return self._response(self.insert())
             else:
-                return self._response(self.insertInto(self._prepareId(element)))
-        except Exception:
-            return self._response(self._respError())
+                return self._response(self.insert_into(self._prepare_id(element)))
+        except Exception as e:
+            return self._response(self._resp_error(e.__str__()))
+            pass
     
     def PUT(self, element=None):
         '''Devuelve la respuesta al método PUT del protocolo HTTP'''
@@ -37,9 +39,10 @@ class RestObject(object):
             if(element is None or element == '/'):
                 return self._response(self.replace())
             else:
-                return self._response(self.updateElement(self._prepareId(element)))
-        except Exception:
-            return self._response(self._respError())
+                return self._response(self.update_element(self._prepare_id(element)))
+        except Exception as e:
+            return self._response(self._resp_error(e.__str__()))
+            pass
     
     def DELETE(self, element=None):
         '''Devuelve la respuesta al método DELETE del protocolo HTTP'''
@@ -47,16 +50,16 @@ class RestObject(object):
             if(element is None or element == '/'):
                 return self._response(self.delete())
             else:
-                return self._response(self.deleteElement(self._prepareId(element)))
-        except Exception:
-            return self._response(self._respError())
+                return self._response(self.delete_element(self._prepare_id(element)))
+        except Exception as e:
+            return self._response(self._resp_error(e.__str__()))
     
     def _response(self, data):
         '''Convierte el diccionario proporcionado en una respuesta del tipo JSON'''
         web.header('Content-Type', 'application/json')
         return json.dumps(data)
     
-    def _prepareId(self, string):
+    def _prepare_id(self, string):
         '''Procesa el parametro opcional obtenido para que se utilice como id'''
         return string.replace('/', '')
     
@@ -64,13 +67,15 @@ class RestObject(object):
         '''Le da el formato adecuado a la respuesta que devuelven los métodos'''
         return {tag: data}
     
-    def _respSuccess(self, result):
+    def _resp_success(self, result):
         '''Respuesta estándar para casos de éxito o fallo de un proceso'''
         return self._resp('success', result)
     
-    def _respError(self):
+    def _resp_error(self, error_str):
         '''Error en caso de excepción'''
-        return self._respSuccess(False)
+        resp = self._resp_success(False)
+        resp['error'] = error_str
+        return resp
     
     def read(self):
         '''Devuelve una lista de elementos en el nodo actual'''
@@ -88,18 +93,18 @@ class RestObject(object):
         '''Elimina completamente el nodo actual'''
         pass
     
-    def getElement(self, id_element):
+    def get_element(self, id_element):
         '''Devuelve el elemento específicado perteneciente al nodo actual'''
         pass
     
-    def insertInto(self, id_element):
+    def insert_into(self, id_element):
         '''Ingresa un subelemento al elemento especificado dentro del nodo'''
         pass
     
-    def updateElement(self, id_element):
+    def update_element(self, id_element):
         '''Actualiza el elemento específicado en el nodo actual'''
         pass
     
-    def deleteElement(self, id_element):
+    def delete_element(self, id_element):
         '''Elimina el elemento específicado dentro del nodo'''
         pass

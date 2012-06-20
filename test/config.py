@@ -12,7 +12,7 @@ import pyros.urlmapper
 urlmap = pyros.urlmapper.URL()
 urlmap.add('/', 'test.restobject.Test')
 urlmap.add('/test/database', 'test.database.Test')
-urls = urlmap.getMap()
+urls = urlmap.get_map()
 
 database = {'dbn': 'mysql', 'user': 'root', 'password': '', 'database': 'pyros_test'}
 

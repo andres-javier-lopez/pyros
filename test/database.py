@@ -29,24 +29,24 @@ class Test(pyros.restobject.RestObject):
     
     def insert(self):
         data = pyros.database.Dataset(self.fields_test, json_data=web.data())
-        result = data.insertTo('test')
-        return self._respSuccess(result)
+        result = data.insert_to('test')
+        return self._resp_success(result)
     
-    def getElement(self, id_element):
-        return self._resp('elemento', self.datamap.getElement(id_element))
+    def get_element(self, id_element):
+        return self._resp('elemento', self.datamap.get_element(id_element))
     
-    def insertInto(self, id_element):
+    def insert_into(self, id_element):
         data = pyros.database.Dataset(['prueba'], json_data=web.data())
-        data.addField('id_test', id_element)
-        result = data.insertTo('test2')
-        return self._respSuccess(result)
+        data.add_field('id_test', id_element)
+        result = data.insert_to('test2')
+        return self._resp_success(result)
     
-    def updateElement(self, id_element):
+    def update_element(self, id_element):
         data = pyros.database.Dataset(self.fields_test)
-        result = data.updateIn('test', id_element, web.data())
-        return self._respSuccess(result)
+        result = data.update_in('test', id_element, web.data())
+        return self._resp_success(result)
     
-    def deleteElement(self, id_element):
+    def delete_element(self, id_element):
         pyros.database.Model('test').delete(id_element)
-        return self._respSuccess(True)
+        return self._resp_success(True)
         
