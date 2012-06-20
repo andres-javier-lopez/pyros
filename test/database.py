@@ -35,6 +35,12 @@ class Test(pyros.restobject.RestObject):
     def getElement(self, id_element):
         return {'elemento': self.datamap.getElement(id_element)}
     
+    def insertInto(self, id_element):
+        data = pyros.database.Dataset(['prueba'], json_data=web.data())
+        data.addField('id_test', id_element)
+        result = data.insertTo('test2')
+        return {'success': result}
+    
     def updateElement(self, id_element):
         data = pyros.database.Dataset(self.fields_test)
         result = data.updateIn('test', id_element, web.data())

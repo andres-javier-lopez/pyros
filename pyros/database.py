@@ -122,6 +122,10 @@ class Dataset(object):
             
     def _readData(self):
         return self.values
+    
+    def addField(self, field, value):
+        self.fields.append(field)
+        self.values[field] = value
             
     def getFrom(self, table, id_data):
         model = Model(table, self.fields)
