@@ -1,50 +1,48 @@
 #coding: utf-8
 
-'''
-Created on 13/06/2012
+u"""Operaciones de base de datos."""
+## @copyright: TuApp.net - GNU Lesser General Public License
+## @author: Andrés Javier López <ajavier.lopez@gmail.com>
 
-@author: Andrés Javier López <ajavier.lopez@gmail.com>
-@version: 1.0
-'''
 import web
 import json
 
 def check_connection():
-    '''Comprueba la conexión activa'''
+    u"""Comprueba la conexión activa"""
     if(Database.main is None):
         return False
     else:
         return True
 
 class DatabaseError(Exception):
-    '''Error local de base de datos'''
+    u"""Error local de base de datos"""
     pass
 
 class DatasetError(DatabaseError):
-    '''Error provocado en el Dataset'''
+    u"""Error provocado en el Dataset"""
     pass
 
 class Database(object):
-    '''Conexión general a la base de datos'''
+    u"""Conexión general a la base de datos"""
     main = None
         
     def __init__(self, config):
-        '''Creación de la conexión'''
+        u"""Creación de la conexión"""
         self.db = web.database(dbn=config['dbn'], user = config['user'], pw = config['password'], db = config['database'])
         
     def get_connection(self):
-        '''Devuelve la conexión activa'''
+        u"""Devuelve la conexión activa"""
         return self.db
     
     @staticmethod
     def initialize(config):
-        '''Inicializa la configuración de la conexión'''
+        u"""Inicializa la configuración de la conexión"""
         Database.main = Database(config)
     
 class Model(object):
-    '''Proporciona las operaciones estándar para la base de datos'''
+    u"""Proporciona las operaciones estándar para la base de datos"""
     def __init__(self, table, fields = [], _test = False):
-        '''Inicializa la conexión y los valores del modelo'''
+        u"""Inicializa la conexión y los valores del modelo"""
         if(Database.main is not None):
             self.db = Database.main.get_connection()
         else:
@@ -54,7 +52,7 @@ class Model(object):
         self._test = _test
         
     def list_all(self, where = None, order = None):
-        '''Lista de elementos de una tabla'''
+        u"""Lista de elementos de una tabla"""
         if(self.table is None):
             raise DatabaseError(u'No se definió una tabla en el modelo')
         if(self.fields == []):
@@ -68,7 +66,7 @@ class Model(object):
         return rows        
     
     def get(self, id_data):
-        '''Obtiene un registro específico de una tabla'''
+        u"""Obtiene un registro específico de una tabla"""
         if(self.table is None):
             raise DatabaseError(u'No se definió una tabla en el modelo')
         if(self.fields == []):
@@ -83,7 +81,7 @@ class Model(object):
             return {}
     
     def insert(self, values):
-        '''Ingresa un registro a la tabla'''
+        u"""Ingresa un registro a la tabla"""
         vals = []
         for key  in values.keys():
             vals.append( '$'+key )
@@ -91,7 +89,7 @@ class Model(object):
         self.db.query(query, vars=values, _test = self._test)
     
     def update(self, id_data, values):
-        '''Actualiza un registro de la tabla'''
+        u"""Actualiza un registro de la tabla"""
         vals = []
         for key  in values.keys():
             vals.append( key +' = $'+key )
@@ -99,15 +97,15 @@ class Model(object):
         self.db.query(query, vars=values, _test = self._test)
     
     def delete(self, id_data):
-        '''Elimina un registro en la tabla'''
+        u"""Elimina un registro en la tabla"""
         where = 'id_' + self.table + ' = $id_data'
         self.db.delete(self.table, where=where, vars={'id_data': id_data})
     
 
 class Dataset(object):
-    '''Simula un registro en una tabla para poder hacer inserciones y actualizaciones'''
+    u"""Simula un registro en una tabla para poder hacer inserciones y actualizaciones"""
     def __init__(self, fields, json_data=None, index=None):
-        '''Construye un registro con los datos proporcionados'''
+        u"""Construye un registro con los datos proporcionados"""
         self.fields = fields
         self.values = {}
                 
@@ -117,7 +115,7 @@ class Dataset(object):
             self.json_data = {}
     
     def _load_JSON(self, json_data, index=None, strict=True):
-        '''Obtiene datos del registro proporcionados en formato JSON'''
+        u"""Obtiene datos del registro proporcionados en formato JSON"""
         try:
             self.json_data = json.loads(json_data)
         except ValueError:
@@ -130,7 +128,7 @@ class Dataset(object):
             self._load_data(self.json_data[index], strict)
     
     def _load_data(self, data, strict=True):
-        '''Obtiene datos del registro proporcionados en un diccionario'''
+        u"""Obtiene datos del registro proporcionados en un diccionario"""
         for field in self.fields:
             try:
                 self.values[field] = data[field]
@@ -139,23 +137,23 @@ class Dataset(object):
                     raise DatasetError(u'El campo ' + field + ' no fue proporcionado')
             
     def _read_data(self):
-        '''Devuelve la lista de campos y datos correspondiente al registro'''
+        u"""Devuelve la lista de campos y datos correspondiente al registro"""
         return self.values
     
     def add_field(self, field, value):
-        '''Agrega un nuevo campo al registro'''
+        u"""Agrega un nuevo campo al registro"""
         self.fields.append(field)
         self.values[field] = value
             
     def get_from(self, table, id_data):
-        '''Carga la información del registro proporcionado'''
+        u"""Carga la información del registro proporcionado"""
         model = Model(table, self.fields)
         data = model.get(id_data)
         self._load_data(data)
         return self._read_data()
         
     def insert_to(self, table):
-        '''Inserta el registro a la tabla proporcionada'''
+        u"""Inserta el registro a la tabla proporcionada"""
         if(len(self.values) == 0):
             raise DatasetError(u'Dataset vacío')
         
@@ -164,7 +162,7 @@ class Dataset(object):
         return True
     
     def update_in(self, table, id_data, data):
-        '''Actualiza el registro en la tabla proporcionada'''
+        u"""Actualiza el registro en la tabla proporcionada"""
         if(len(self.values) == 0):
             self.get_from(table, id_data)
         self._load_JSON(data, strict=False)
@@ -173,9 +171,9 @@ class Dataset(object):
         return True
         
 class Datamap(object):
-    '''Objeto para realizar mapeo de datos'''
+    u"""Objeto para realizar mapeo de datos"""
     def __init__(self, table, fields=[], where=None):
-        '''Crea un mapa de datos de la tabla proporcionada'''
+        u"""Crea un mapa de datos de la tabla proporcionada"""
         self.table = table
         self.where = where
         self.joins = []
@@ -183,7 +181,7 @@ class Datamap(object):
         self.model = Model(self.table, self.fields)
         
     def add_join(self, datamap, join_field = None, tag = None):
-        '''Agrega un submapa a través de llaves foráneas'''
+        u"""Agrega un submapa a través de llaves foráneas"""
         if(not isinstance(datamap, Datamap)):
             raise DatabaseError(u'Se agregó un objeto diferente de Datamap al join')
         if(tag is None):
@@ -191,11 +189,11 @@ class Datamap(object):
         self.joins.append({'datamap': datamap, 'tag': tag, 'join_field': join_field})
     
     def add_where(self, where):
-        '''Establece una condición de búsqueda'''
+        u"""Establece una condición de búsqueda"""
         self.where = where
        
     def read(self):
-        '''Devuelve la lista completa de los elementos del mapa'''
+        u"""Devuelve la lista completa de los elementos del mapa"""
         main_list = self.model.list_all(where=self.where)
         for element in main_list:
             for sub in self.joins:
@@ -206,7 +204,7 @@ class Datamap(object):
         return main_list
     
     def get_element(self, id_element):
-        '''Devuelve un único elemento en el mapa con el id proporcionado'''
+        u"""Devuelve un único elemento en el mapa con el id proporcionado"""
         data = self.model.get(id_element)
         if(data != {}):
             for sub in self.joins:
