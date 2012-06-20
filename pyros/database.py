@@ -143,6 +143,7 @@ class Datamap(object):
         self.where = where
         self.joins = []
         self.fields = fields
+        self.model = Model(self.table, self.fields)
         
     def add_join(self, datamap, join_field = None, tag = None):
         if(not isinstance(datamap, Datamap)):
@@ -155,13 +156,21 @@ class Datamap(object):
         self.where = where
        
     def read(self):
-        model = Model(self.table, self.fields)
-        main_list = model.list_all(where=self.where)
+        main_list = self.model.list_all(where=self.where)
         for element in main_list:
             for sub in self.joins:
                 submap = sub['datamap']
                 where = sub['join_field'] + ' = ' + getattr(element, sub['join_field']).__str__()
                 submap.add_where(where)
                 setattr(element, sub['tag'], submap.read())
-        return {'data': main_list}
+        return main_list
+    
+    def getElement(self, id_element):
+        data = self.model.get(id_element)
+        for sub in self.joins:
+            submap = sub['datamap']
+            where = sub['join_field'] + ' = ' + getattr(data, sub['join_field']).__str__()
+            submap.add_where(where)
+            setattr(data, sub['tag'], submap.read())
+        return data
         
