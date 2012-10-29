@@ -10,15 +10,15 @@ import pyros.restobject
 
 
 class Test(pyros.restobject.RestObject):
-    def GET(self):
+    def GET(self, element=None):
         return "esta es una prueba"
     
-    def POST(self):
+    def POST(self, element=None):
         return 'probando post'
     
-    def PUT(self):
+    def PUT(self, element=None):
         return 'probando put'
     
-    def DELETE(self):
+    def DELETE(self, element=None):
         return 'probando delete'
     
