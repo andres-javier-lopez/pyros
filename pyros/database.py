@@ -56,15 +56,45 @@ class Model(object):
         u"""Lista de elementos de una tabla"""
         if(self.table is None):
             raise DatabaseError(u'No se definió una tabla en el modelo')
-        if(self.fields == []):
+        if(self.fields == []): 
             fields = '*'
-        else:
+        else: # Agregar automaticamente el campo primary
             fields = web.db.sqllist(self.fields)
         result = self.db.select(self.table, what = fields, where = where, order = order, _test = self._test )
         rows = []
         for data in result:
             rows.append(data)
-        return rows        
+        return rows
+    
+    def joined_read(self, joined, where = None, order = None):
+        u"""Read especial que permite hacer joins entre tablas"""
+        if(self.table is None):
+            raise DatabaseError(u'No se definió una tabla en el modelo')
+        if(self.fields == []): 
+            table_fields = ['*']
+        else: # Agregar automaticamente el campo primary
+            table_fields = []
+            for field in self.fields:
+                table_fields.append(self.table + '.' + field)
+        
+        join_cond = ''
+        for table in joined:
+            join_fields = table['fields']
+            for field in join_fields:
+                table_fields.append(table['table'] + "." + field)
+            join_cond += " LEFT JOIN " + table['table'] + " ON " + table["cond"]
+        
+        fields = web.db.sqllist(table_fields)
+        sql = "SELECT " + fields + " FROM " + self.table + join_cond
+        if(where is not None):
+            sql += " WHERE " + where
+        if(order is not None):
+            sql += " ORDER BY " + order
+        result = self.db.query(sql)
+        rows = []
+        for data in result:
+            rows.append(data)
+        return rows
     
     def get(self, id_data):
         u"""Obtiene un registro específico de una tabla"""
@@ -76,6 +106,32 @@ class Model(object):
             fields = web.db.sqllist(self.fields)
         where = self.primary + ' = ' + id_data
         result = self.db.select(self.table, what = fields, where = where, _test = self._test )
+        if(len(result) == 1):
+            return result[0]
+        else:
+            return {}
+        
+    def joined_get(self, id_data, joined):
+        u"""Read especial que permite hacer joins entre tablas"""
+        if(self.table is None):
+            raise DatabaseError(u'No se definió una tabla en el modelo')
+        if(self.fields == []): 
+            table_fields = ['*']
+        else: # Agregar automaticamente el campo primary
+            table_fields = []
+            for field in self.fields:
+                table_fields.append(self.table + '.' + field)
+        
+        join_cond = ''
+        for table in joined:
+            join_fields = table['fields']
+            for field in join_fields:
+                table_fields.append(table['table'] + "." + field)
+            join_cond += " LEFT JOIN " + table['table'] + " ON " + table["cond"]
+        
+        fields = web.db.sqllist(table_fields)
+        sql = "SELECT " + fields + " FROM " + self.table + join_cond + " WHERE " + self.table + '.' + self.primary + " = " + id_data
+        result = self.db.query(sql)
         if(len(result) == 1):
             return result[0]
         else:
@@ -178,13 +234,14 @@ class Dataset(object):
         
 class Datamap(object):
     u"""Objeto para realizar mapeo de datos"""
-    def __init__(self, table, primary = 'id', fields=[], where=None):
+    def __init__(self, table, primary = 'id', fields=[], where=None, joined = None):
         u"""Crea un mapa de datos de la tabla proporcionada"""
         self.table = table
         self.primary = primary
         self.where = where
         self.joins = []
         self.fields = fields
+        self.joined = joined
         self.model = Model(self.table, self.primary, self.fields)
         
     def add_join(self, datamap, join_field = None, join_key = None, tag = None):
@@ -207,7 +264,10 @@ class Datamap(object):
        
     def read(self):
         u"""Devuelve la lista completa de los elementos del mapa"""
-        main_list = self.model.read(where=self.where)
+        if(self.joined is None):
+            main_list = self.model.read(where=self.where)
+        else:
+            main_list = self.model.joined_read(self.joined, where = self.where)
         for element in main_list:
             for sub in self.joins:
                 submap = sub['datamap']
@@ -218,7 +278,10 @@ class Datamap(object):
     
     def get_element(self, id_element):
         u"""Devuelve un único elemento en el mapa con el id proporcionado"""
-        data = self.model.get(id_element)
+        if(self.joined is None):
+            data = self.model.get(id_element)
+        else:
+            data = self.model.joined_get(id_element, self.joined)
         if(data != {}):
             for sub in self.joins:
                 submap = sub['datamap']

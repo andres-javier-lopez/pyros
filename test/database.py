@@ -21,7 +21,7 @@ class Test(pyros.restobject.RestObject):
         test2 = pyros.database.Datamap('test2', 'id_test2')
         test2.add_join(test3, tag = 'internos')
         
-        self.datamap = pyros.database.Datamap('test', 'id_test', ['id_test', 'valor1_test AS valor1', 'valor2_test'])
+        self.datamap = pyros.database.Datamap('test', 'id_test', ['id_test', 'valor1_test AS valor1', 'valor2_test'], joined = [{"table": "test2", "fields": ["id_test2 AS tablita"], "cond": "test.id_test = test2.id_test AND prueba = 42"}])
         self.datamap.add_join(test2, tag = 'subtest')
         
         self.table = 'test'
