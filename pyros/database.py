@@ -41,7 +41,7 @@ class Database(object):
     
 class Model(object):
     u"""Proporciona las operaciones estándar para la base de datos"""
-    def __init__(self, table, fields = [], _test = False):
+    def __init__(self, table, primary = 'id', fields = [], _test = False):
         u"""Inicializa la conexión y los valores del modelo"""
         if(Database.main is not None):
             self.db = Database.main.get_connection()
@@ -50,8 +50,9 @@ class Model(object):
         self.table = table
         self.fields = fields
         self._test = _test
+        self.primary = primary
         
-    def list_all(self, where = None, order = None):
+    def read(self, where = None, order = None):
         u"""Lista de elementos de una tabla"""
         if(self.table is None):
             raise DatabaseError(u'No se definió una tabla en el modelo')
@@ -73,7 +74,7 @@ class Model(object):
             fields = '*'
         else:
             fields = web.db.sqllist(self.fields)
-        where = 'id_' + self.table + ' = ' + id_data
+        where = self.primary + ' = ' + id_data
         result = self.db.select(self.table, what = fields, where = where, _test = self._test )
         if(len(result) == 1):
             return result[0]
@@ -93,19 +94,21 @@ class Model(object):
         vals = []
         for key  in values.keys():
             vals.append( key +' = $'+key )
-        query = 'UPDATE ' + self.table + ' SET ' + web.db.sqllist(vals) + ' WHERE `id_' + self.table + '` = ' + id_data
+        query = 'UPDATE ' + self.table + ' SET ' + web.db.sqllist(vals) + ' WHERE `' + self.primary + '` = ' + id_data
         self.db.query(query, vars=values, _test = self._test)
     
     def delete(self, id_data):
         u"""Elimina un registro en la tabla"""
-        where = 'id_' + self.table + ' = $id_data'
+        where = self.primary + ' = $id_data'
         self.db.delete(self.table, where=where, vars={'id_data': id_data})
     
 
 class Dataset(object):
     u"""Simula un registro en una tabla para poder hacer inserciones y actualizaciones"""
-    def __init__(self, fields, json_data=None, index=None):
+    def __init__(self, table, primary, fields, json_data=None, index=None):
         u"""Construye un registro con los datos proporcionados"""
+        self.table = table
+        self.primary = primary
         self.fields = fields
         self.values = {}
                 
@@ -145,62 +148,70 @@ class Dataset(object):
         self.fields.append(field)
         self.values[field] = value
             
-    def get_from(self, table, id_data):
+    def get_data(self, id_data):
         u"""Carga la información del registro proporcionado"""
-        model = Model(table, self.fields)
+        model = Model(self.table, self.primary, self.fields)
         data = model.get(id_data)
         if(data == {}):
-            raise DatasetError("No existe el registro al que se quiere acceder")
+            raise DatasetError(u'No existe el registro al que se quiere acceder')
         self._load_data(data)
         return self._read_data()
         
-    def insert_to(self, table):
+    def insert(self):
         u"""Inserta el registro a la tabla proporcionada"""
         if(len(self.values) == 0):
             raise DatasetError(u'Dataset vacío')
         
-        model = Model(table, self.fields)
+        model = Model(self.table, self.primary, self.fields)
         model.insert(self.values)
         return True
     
-    def update_in(self, table, id_data, data):
+    def update(self, id_data, data = ''):
         u"""Actualiza el registro en la tabla proporcionada"""
         if(len(self.values) == 0):
-            self.get_from(table, id_data)
-        self._load_JSON(data, strict=False)
-        model = Model(table, self.fields)
+            self.get_data(id_data)
+        if(data != ''):
+            self._load_JSON(data, strict=False)
+        model = Model(self.table, self.primary, self.fields)
         model.update(id_data, self.values)
         return True
         
 class Datamap(object):
     u"""Objeto para realizar mapeo de datos"""
-    def __init__(self, table, fields=[], where=None):
+    def __init__(self, table, primary = 'id', fields=[], where=None):
         u"""Crea un mapa de datos de la tabla proporcionada"""
         self.table = table
+        self.primary = primary
         self.where = where
         self.joins = []
         self.fields = fields
-        self.model = Model(self.table, self.fields)
+        self.model = Model(self.table, self.primary, self.fields)
         
-    def add_join(self, datamap, join_field = None, tag = None):
+    def add_join(self, datamap, join_field = None, join_key = None, tag = None):
         u"""Agrega un submapa a través de llaves foráneas"""
         if(not isinstance(datamap, Datamap)):
             raise DatabaseError(u'Se agregó un objeto diferente de Datamap al join')
         if(tag is None):
             tag = datamap.table
-        self.joins.append({'datamap': datamap, 'tag': tag, 'join_field': join_field})
+        if(join_field is None):
+            join_field = self.primary
+        if(join_key is None):
+            join_key = join_field
+            
+        self.joins.append({'datamap': datamap, 'tag': tag, 'join_field': join_field, 'join_key': join_key})
     
     def add_where(self, where):
         u"""Establece una condición de búsqueda"""
+        # Esto se puede mejorar en un futuro
         self.where = where
        
     def read(self):
         u"""Devuelve la lista completa de los elementos del mapa"""
-        main_list = self.model.list_all(where=self.where)
+        main_list = self.model.read(where=self.where)
         for element in main_list:
             for sub in self.joins:
                 submap = sub['datamap']
-                where = sub['join_field'] + ' = ' + getattr(element, sub['join_field']).__str__()
+                where = sub['join_field'] + ' = ' + getattr(element, sub['join_key']).__str__()
                 submap.add_where(where)
                 setattr(element, sub['tag'], submap.read())
         return main_list
@@ -211,7 +222,7 @@ class Datamap(object):
         if(data != {}):
             for sub in self.joins:
                 submap = sub['datamap']
-                where = sub['join_field'] + ' = ' + getattr(data, sub['join_field']).__str__()
+                where = sub['join_field'] + ' = ' + getattr(data, sub['join_key']).__str__()
                 submap.add_where(where)
                 setattr(data, sub['tag'], submap.read())
         return data
