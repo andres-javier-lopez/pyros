@@ -36,6 +36,8 @@ class Test(pyros.restobject.RestObject):
         return self._resp('elemento', self.datamap.get_element(id_element))
     
     def insert_into(self, id_element):
+        if(self.datamap.get_element(id_element) == {}):
+            return self._resp_error("No existe la colección en la que se quiere insertar el objeto")
         data = pyros.database.Dataset(['prueba'], json_data=web.data())
         data.add_field('id_test', id_element)
         result = data.insert_to('test2')

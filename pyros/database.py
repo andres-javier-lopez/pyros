@@ -149,6 +149,8 @@ class Dataset(object):
         u"""Carga la información del registro proporcionado"""
         model = Model(table, self.fields)
         data = model.get(id_data)
+        if(data == {}):
+            raise DatasetError("No existe el registro al que se quiere acceder")
         self._load_data(data)
         return self._read_data()
         
