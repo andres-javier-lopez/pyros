@@ -11,6 +11,8 @@ import pyros.database
 import config
 import web
 
+pyros.restobject.debug_info = True
+
 class Test(pyros.restobject.RestObject):
     def __init__(self):
         config.check_database()

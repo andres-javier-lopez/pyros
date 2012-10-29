@@ -6,6 +6,9 @@ u"""Objeto base para la creación de apliaciones REST."""
 
 import web
 import json
+import traceback
+
+debug_info = False
 
 class RestObject(object):
     u"""Prototipo de un objeto REST para construir un nodo en el API, se deben de implementar sus procesos"""
@@ -17,8 +20,7 @@ class RestObject(object):
             else:
                 return self._response(self.get_element(self._prepare_id(element)))
         except Exception as e:
-            return self._response(self._resp_error(e.__str__()))
-            pass
+            return self._response(self._resp_error(e.__str__(), str(type(e))))
     
     def POST(self, element=None):
         u"""Devuelve la respuesta al método POST del protocolo HTTP"""
@@ -28,8 +30,7 @@ class RestObject(object):
             else:
                 return self._response(self.insert_into(self._prepare_id(element)))
         except Exception as e:
-            return self._response(self._resp_error(e.__str__()))
-            pass
+            return self._response(self._resp_error(e.__str__(), str(type(e))))
     
     def PUT(self, element=None):
         u"""Devuelve la respuesta al método PUT del protocolo HTTP"""
@@ -39,8 +40,7 @@ class RestObject(object):
             else:
                 return self._response(self.update_element(self._prepare_id(element)))
         except Exception as e:
-            return self._response(self._resp_error(e.__str__()))
-            pass
+            return self._response(self._resp_error(e.__str__(), str(type(e))))
     
     def DELETE(self, element=None):
         u"""Devuelve la respuesta al método DELETE del protocolo HTTP"""
@@ -50,7 +50,7 @@ class RestObject(object):
             else:
                 return self._response(self.delete_element(self._prepare_id(element)))
         except Exception as e:
-            return self._response(self._resp_error(e.__str__()))
+            return self._response(self._resp_error(e.__str__(), str(type(e))))
     
     def _response(self, data):
         u"""Convierte el diccionario proporcionado en una respuesta del tipo JSON"""
@@ -69,10 +69,13 @@ class RestObject(object):
         u"""Respuesta estándar para casos de éxito o fallo de un proceso"""
         return self._resp('success', result)
     
-    def _resp_error(self, error_str):
+    def _resp_error(self, error_str, debug = ''):
         u"""Error en caso de excepción"""
         resp = self._resp_success(False)
         resp['error'] = error_str
+        if(debug_info):
+            resp['debug'] = debug
+            traceback.print_exc()
         return resp
     
     def read(self):
