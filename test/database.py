@@ -21,12 +21,12 @@ class Test(pyros.restobject.RestObject):
         test2 = pyros.database.Datamap('test2', 'id_test2')
         test2.add_join(test3, tag = 'internos')
         
-        self.datamap = pyros.database.Datamap('test', 'id_test', ['id_test', 'valor1_test AS valor1', 'valor2_test'], joined = [{"table": "test2", "fields": ["id_test2 AS tablita"], "cond": "test.id_test = test2.id_test AND prueba = 42"}])
+        self.datamap = pyros.database.Datamap('test', 'id_test', ['id_test', 'valor1#s AS valor1', 'valor2#s'], joined = [{"table": "test2", "fields": ["id_test2 AS tablita"], "cond": "test.id_test = test2.id_test AND prueba = 42"}], suffix="_test")
         self.datamap.add_join(test2, tag = 'subtest')
         
         self.table = 'test'
         self.primary_test = 'id_test'
-        self.fields_test = ['valor1_test', 'valor2_test']
+        self.fields_test = ['valor1#s', 'valor2#s']
         
     def read(self):
         return self._resp('elementos', self.datamap.read())
