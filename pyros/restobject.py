@@ -15,8 +15,15 @@ class RestObject(object):
     u"""Prototipo de un objeto REST para construir un nodo en el API, se deben de implementar sus procesos"""
     def authenticate(self, method):
         data = web.input()
-        signature = data.signature
-        timestamp = data.timestamp
+        try:
+            signature = data.signature
+            timestamp = data.timestamp
+        except AttributeError:
+            if(self.get_auth_key(method) == ''):
+                return
+            else:
+                raise auth.AuthError()
+            
         authobj = auth.Auth(self.get_auth_key(method))
         
         datastring = method + ' ' + web.ctx.path
