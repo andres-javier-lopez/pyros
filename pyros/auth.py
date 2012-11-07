@@ -18,6 +18,9 @@ class Auth:
         self.algorithm = algorithm
     
     def is_valid(self, data, hashed, timestamp):
+        if(self.key == ''):
+            return True
+        
         diff = datetime.datetime.utcnow() - datetime.datetime.utcfromtimestamp(timestamp)
         if(diff > datetime.timedelta(minutes=5)):
             return False

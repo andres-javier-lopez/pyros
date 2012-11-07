@@ -7,48 +7,85 @@ u"""Objeto base para la creación de apliaciones REST."""
 import web
 import json
 import traceback
+import auth
 
 debug_info = False
 
 class RestObject(object):
     u"""Prototipo de un objeto REST para construir un nodo en el API, se deben de implementar sus procesos"""
+    def authenticate(self, method):
+        data = web.input()
+        signature = data.signature
+        timestamp = data.timestamp
+        authobj = auth.Auth(self.get_auth_key(method))
+        
+        datastring = method + ' ' + web.ctx.path
+        sep = '?'
+        for key in sorted(data.iterkeys()):
+            if(key != 'signature'):
+                datastring +=  sep + key + '=' + data[key]
+                if(sep == '?'):
+                    sep = '&'
+        
+        if(not authobj.is_valid(datastring, signature, timestamp)):
+            raise auth.AuthError()
+    
+    def get_auth_key(self, method):
+        return ''
+    
     def GET(self, element=None):
         u"""Devuelve la respuesta al método GET del protocolo HTTP"""
         try:
+            self.authenticate('GET')
             if(element is None or element == '/'):
                 return self._response(self.read())
             else:
                 return self._response(self.get_element(self._prepare_id(element)))
+        except auth.AuthError as e:
+            web.webapi.unauthorized()
+            return self._response(self._resp_error(e.__str__(), str(type(e))))
         except Exception as e:
             return self._response(self._resp_error(e.__str__(), str(type(e))))
     
     def POST(self, element=None):
         u"""Devuelve la respuesta al método POST del protocolo HTTP"""
         try:
+            self.authenticate('POST')
             if(element is None or element == '/'):
                 return self._response(self.insert())
             else:
                 return self._response(self.insert_into(self._prepare_id(element)))
+        except auth.AuthError as e:
+            web.webapi.unauthorized()
+            return self._response(self._resp_error(e.__str__(), str(type(e))))
         except Exception as e:
             return self._response(self._resp_error(e.__str__(), str(type(e))))
     
     def PUT(self, element=None):
         u"""Devuelve la respuesta al método PUT del protocolo HTTP"""
         try:
+            self.authenticate('PUT')
             if(element is None or element == '/'):
                 return self._response(self.replace())
             else:
                 return self._response(self.update_element(self._prepare_id(element)))
+        except auth.AuthError as e:
+            web.webapi.unauthorized()
+            return self._response(self._resp_error(e.__str__(), str(type(e))))
         except Exception as e:
             return self._response(self._resp_error(e.__str__(), str(type(e))))
     
     def DELETE(self, element=None):
         u"""Devuelve la respuesta al método DELETE del protocolo HTTP"""
         try:
+            self.authenticate('DELETE')
             if(element is None or element == '/'):
                 return self._response(self.delete())
             else:
                 return self._response(self.delete_element(self._prepare_id(element)))
+        except auth.AuthError as e:
+            web.webapi.unauthorized()
+            return self._response(self._resp_error(e.__str__(), str(type(e))))
         except Exception as e:
             return self._response(self._resp_error(e.__str__(), str(type(e))))
     
