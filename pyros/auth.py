@@ -13,7 +13,7 @@ class AuthError (Exception):
 class Auth:
     u"""Sistema de autenticación"""
     
-    def __init__(self, key, algorithm = hashlib.sha256()):
+    def __init__(self, key, algorithm = hashlib.sha256):
         self.key = key
         self.algorithm = algorithm
     
@@ -21,8 +21,8 @@ class Auth:
         if(self.key == ''):
             return True
         
-        diff = datetime.datetime.utcnow() - datetime.datetime.utcfromtimestamp(timestamp)
-        if(diff > datetime.timedelta(minutes=5)):
+        diff = datetime.datetime.utcnow() - datetime.datetime.utcfromtimestamp(float(timestamp))
+        if(-1*diff > datetime.timedelta(minutes=5)):
             return False
         
         if(hashed == hmac.new(self.key, data, self.algorithm).hexdigest()):
