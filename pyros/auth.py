@@ -22,7 +22,7 @@ class Auth:
             return True
         
         diff = datetime.datetime.utcnow() - datetime.datetime.utcfromtimestamp(float(timestamp))
-        if(-1*diff > datetime.timedelta(minutes=5)):
+        if(diff < 0 or diff > datetime.timedelta(minutes=5)):
             return False
         
         if(hashed == hmac.new(self.key, data, self.algorithm).hexdigest()):
