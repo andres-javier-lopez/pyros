@@ -124,6 +124,9 @@ class Model(object):
         result = self.db.query(sql)
         rows = []
         for data in result:
+            fields = data.__dict__
+            for key in fields.keys():
+                setattr(data, key, str(getattr(data, key)))
             rows.append(data)
         return rows
     
@@ -140,7 +143,11 @@ class Model(object):
         where = self.primary + ' = ' + id_data
         result = self.db.select(self.table, what = fields, where = self._suffix(where, False), _test = self._test )
         if(len(result) == 1):
-            return result[0]
+            data = result[0]
+            fields = data.__dict__
+            for key in fields.keys():
+                setattr(data, key, str(getattr(data, key)))
+            return data
         else:
             return {}
         
