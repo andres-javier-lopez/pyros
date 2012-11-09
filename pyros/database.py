@@ -93,8 +93,8 @@ class Model(object):
         result = self.db.select(self.table, what = fields, where = self._suffix(where, False), order = self._suffix(order, False), _test = self._test )
         rows = []
         for data in result:
-            fields = data.__dict__
-            for key in fields.keys():
+            for key in self.fields:
+                key = key.replace('#s', '')
                 setattr(data, key, str(getattr(data, key)))
             rows.append(data)
         return rows
@@ -127,8 +127,8 @@ class Model(object):
         result = self.db.query(sql)
         rows = []
         for data in result:
-            fields = data.__dict__
-            for key in fields.keys():
+            for key in self.fields:
+                key = key.replace('#s', '')
                 setattr(data, key, str(getattr(data, key)))
             rows.append(data)
         return rows
@@ -147,8 +147,8 @@ class Model(object):
         result = self.db.select(self.table, what = fields, where = self._suffix(where, False), _test = self._test )
         if(len(result) == 1):
             data = result[0]
-            fields = data.__dict__
-            for key in fields.keys():
+            for key in self.fields:
+                key = key.replace('#s', '')
                 setattr(data, key, str(getattr(data, key)))
             return data
         else:
@@ -178,8 +178,8 @@ class Model(object):
         result = self.db.query(sql)
         if(len(result) == 1):
             data = result[0]
-            fields = data.__dict__
-            for key in fields.keys():
+            for key in self.fields:
+                key = key.replace('#s', '')
                 setattr(data, key, str(getattr(data, key)))
             return data
         else:
