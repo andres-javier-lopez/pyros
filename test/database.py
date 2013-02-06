@@ -10,29 +10,20 @@ import pyros.restobject
 import pyros.database
 import config
 import web
+import definitions
 
 pyros.restobject.debug_info = True
 
 class Test(pyros.restobject.RestObject):
     def __init__(self):
         config.check_database()
-        test3 = pyros.database.Datamap('test3', 'id_test3')
-        
-        test2 = pyros.database.Datamap('test2', 'id_test2')
-        test2.add_join(test3, tag = 'internos')
-        
-        self.datamap = pyros.database.Datamap('test', 'id_test', ['id_test', 'valor1#s AS valor1', 'valor2#s'], joined = [{"table": "test2", "fields": ["id_test2 AS tablita"], "cond": "test.id_test = test2.id_test AND prueba = 42"}], suffix="_test")
-        self.datamap.add_join(test2, tag = 'subtest')
-        
-        self.table = 'test'
-        self.primary_test = 'id_test'
-        self.fields_test = ['valor1#s', 'valor2#s']
+        self.datamap = pyros.database.Datamap(definitions.test1)
         
     def read(self):
         return self._resp('elementos', self.datamap.read())
     
     def insert(self):
-        data = pyros.database.Dataset(self.table, self.primary_test, self.fields_test, json_data=web.data())
+        data = pyros.database.Dataset(definitions.test1, json_data=web.data())
         result = data.insert()
         return self._resp_success(result)
     
@@ -42,17 +33,17 @@ class Test(pyros.restobject.RestObject):
     def insert_into(self, id_element):
         if(self.datamap.get_element(id_element) == {}):
             return self._resp_error(u'No existe la colección en la que se quiere insertar el objeto')
-        data = pyros.database.Dataset('test2', 'id_test2', ['prueba'], json_data=web.data())
+        data = pyros.database.Dataset(definitions.test2, json_data=web.data())
         data.add_field('id_test', id_element)
         result = data.insert()
         return self._resp_success(result)
     
     def update_element(self, id_element):
-        data = pyros.database.Dataset(self.table, self.primary_test, self.fields_test)
+        data = pyros.database.Dataset(definitions.test1)
         result = data.update(id_element, web.data())
         return self._resp_success(result)
     
     def delete_element(self, id_element):
-        pyros.database.Model(self.table, self.primary_test).delete(id_element)
+        pyros.database.Model(definitions.test1.table, definitions.test1.primary).delete(id_element)
         return self._resp_success(True)
 

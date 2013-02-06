@@ -38,6 +38,26 @@ class Database(object):
     def initialize(config):
         u"""Inicializa la configuración de la conexión"""
         Database.main = Database(config)
+        
+class Table(object):
+    u"""Datos generales de una Tabla"""
+    def __init__(self, table="", primary="", fields = None, readfields = None, joined = None, suffix=""):
+        self.table = table
+        self.primary = primary
+        if fields is not None:
+            self.fields = fields
+        else:
+            self.fields = []
+        if readfields is not None:
+            self.readfields = readfields
+        else:
+            self.readfields = []
+        self.joined = joined
+        self.relations = []
+        self.suffix = suffix
+        
+    def add_relation(self, tabledata, join_field = None, join_key = None, tag = None):
+        self.relations.append({"data": tabledata, "field": join_field, "key": join_key, "tag": tag})
     
 class Model(object):
     u"""Proporciona las operaciones estándar para la base de datos"""
@@ -209,12 +229,12 @@ class Model(object):
 
 class Dataset(object):
     u"""Simula un registro en una tabla para poder hacer inserciones y actualizaciones"""
-    def __init__(self, table, primary, fields, suffix='', json_data=None, index=None):
-        u"""Construye un registro con los datos proporcionados"""
-        self.table = table
-        self.primary = primary
-        self.fields = fields
-        self.suffix = suffix
+    def __init__(self, tabledata, json_data=None, index=None):
+        u"""Construye un registro con los datos proporcionados"""        
+        self.table = tabledata.table
+        self.primary = tabledata.primary
+        self.fields = tabledata.fields
+        self.suffix = tabledata.suffix
         self.values = {}
                 
         if(json_data is not None):
@@ -285,19 +305,24 @@ class Dataset(object):
         model = Model(self.table, self.primary, self.fields, suffix = self.suffix)
         model.update(id_data, self.values)
         return True
-        
+
 class Datamap(object):
     u"""Objeto para realizar mapeo de datos"""
-    def __init__(self, table, primary = 'id', fields=[], where=None, joined = None, suffix = ''):
-        u"""Crea un mapa de datos de la tabla proporcionada"""
-        self.table = table
-        self.primary = primary
+    def __init__(self, tabledata, where=None):
+        u"""Crea un mapa de datos de la tabla proporcionada"""        
+        self.table = tabledata.table
+        self.primary = tabledata.primary
         self.where = where
         self.joins = []
-        self.fields = fields
-        self.joined = joined
-        self.suffix = suffix
+        self.fields = list(tabledata.fields)
+        self.fields.append(tabledata.primary)
+        self.fields.extend(tabledata.readfields)
+        self.joined = tabledata.joined
+        self.suffix = tabledata.suffix
         self.model = Model(self.table, self.primary, self.fields, suffix = self.suffix)
+        
+        for relation in tabledata.relations:
+            self.add_join(Datamap(relation["data"]), relation["field"], relation["key"], relation["tag"])
         
     def add_join(self, datamap, join_field = None, join_key = None, tag = None):
         u"""Agrega un submapa a través de llaves foráneas"""
