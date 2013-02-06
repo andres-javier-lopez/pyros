@@ -44,6 +44,6 @@ class Test(pyros.restobject.RestObject):
         return self._resp_success(result)
     
     def delete_element(self, id_element):
-        pyros.database.Model(definitions.test1.table, definitions.test1.primary).delete(id_element)
+        pyros.database.Dataset(definitions.test1).delete(id_element)
         return self._resp_success(True)
 

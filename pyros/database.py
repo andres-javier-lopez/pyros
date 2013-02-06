@@ -305,6 +305,9 @@ class Dataset(object):
         model = Model(self.table, self.primary, self.fields, suffix = self.suffix)
         model.update(id_data, self.values)
         return True
+    
+    def delete(self, id_data):
+        Model(self.table, self.primary).delete(id_data)
 
 class Datamap(object):
     u"""Objeto para realizar mapeo de datos"""
