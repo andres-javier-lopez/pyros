@@ -4,18 +4,18 @@ u"""Operaciones de base de datos."""
 ## @copyright: Klan Estudio - www.klanestudio.com 2013
 ## @author: Andrés Javier López <ajavier.lopez@gmail.com>
 
-class BaseDecorator(object):
-    def __init__(self, f):
-        super().__init__()
-        self.f = f
-
-    def __call__(self):
-        self.before_f()
-        self.f()
-        self.after_f()
-        
-    def before_f(self):
-        pass
+def base_decorator(decorator):
+    '''Decorador base que sirve para guardar correctamente los nombres, documentación y atributos.
+    Sacado de http://wiki.python.org/moin/PythonDecoratorLibrary'''
+    def new_decorator(f):
+        g = decorator(f)
+        g.__name__ = f.__name__
+        g.__doc__ = f.__doc__
+        g.__dict__.update(f.__dict__)
+        return g
     
-    def after_f(self):
-        pass
+    new_decorator.__name__ = decorator.__name__
+    new_decorator.__doc__ = decorator.__doc__
+    new_decorator.__dict__.update(decorator.__dict__)
+    return new_decorator
+        
