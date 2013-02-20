@@ -53,7 +53,7 @@ class RestObject(object):
     
     def GET(self, element=None, type=None):
         u"""Devuelve la respuesta al método GET del protocolo HTTP"""
-        if(type is None):
+        if(type is None or type == '/'):
             if(element is None or element == '/'):
                 func = self.get_functions['_all']
             else:
