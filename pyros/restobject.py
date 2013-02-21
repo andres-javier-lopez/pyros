@@ -15,6 +15,7 @@ debug_info = False
 
 @base_decorator
 def get(f):
+    assert(inspect.isfunction(f))
     def func(*args, **kwargs):
         return f(*args, **kwargs)
     func.method = 'get'
@@ -22,8 +23,10 @@ def get(f):
     return func
 
 def getlist(type):
+    assert(not inspect.isfunction(type))
     @base_decorator
     def sub(f):
+        assert(inspect.isfunction(f))
         def func(*args, **kwargs):
             return f(*args, **kwargs)
         func.method = 'get'
@@ -33,6 +36,7 @@ def getlist(type):
 
 @base_decorator
 def getall(f):
+    assert(inspect.isfunction(f))
     def func(element, *args, **kwargs):
         return f(*args, **kwargs)
     func.method = 'get'
@@ -41,6 +45,7 @@ def getall(f):
 
 @base_decorator
 def post(f):
+    assert(inspect.isfunction(f))
     def func(element, *args, **kwargs):
         return f(*args, **kwargs)
     func.method = 'post'
@@ -48,6 +53,7 @@ def post(f):
     return func
 
 def post_into(type='_default'):
+    assert(not inspect.isfunction(type))
     @base_decorator
     def sub(f):
         def func(*args, **kwargs):
@@ -66,6 +72,7 @@ class RestObject(object):
         self.delete_functions = {}
         for func in inspect.getmembers(self, inspect.ismethod):
             try:
+                assert(inspect.isfunction(func[1]))
                 if func[1].method == 'get':
                     self.get_functions[func[1].type] = func[1]
                 if func[1].method == 'post':
