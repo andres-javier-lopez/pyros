@@ -6,7 +6,7 @@ Created on 12/06/2012
 @author: Andrés Javier López <ajavier.lopez@gmail.com>
 @version: 1.0
 '''
-from pyros.restobject import RestObject, get, getall, getlist
+from pyros.restobject import RestObject, get, getall, getlist, post, post_into
 
 
 class Test(RestObject):
@@ -22,8 +22,17 @@ class Test(RestObject):
     def valores(self, elemento):
         return "valores de " + elemento
     
-    def POST(self, element=None):
+    @post
+    def prueba_post(self):
         return 'probando post'
+    
+    @post_into()
+    def prueba_post_general(self, elemento):
+        return 'insertando en ' + elemento
+    
+    @post_into('valores')
+    def prueba_post_valores(self, elemento):
+        return 'insertando valores de ' + elemento
     
     def PUT(self, element=None):
         return 'probando put'

@@ -39,15 +39,41 @@ def getall(f):
     func.type = '_all'
     return func
 
+@base_decorator
+def post(f):
+    def func(element, *args, **kwargs):
+        return f(*args, **kwargs)
+    func.method = 'post'
+    func.type = '_all'
+    return func
+
+def post_into(type='_default'):
+    @base_decorator
+    def sub(f):
+        def func(*args, **kwargs):
+            return f(*args, **kwargs)
+        func.method = 'post'
+        func.type = type
+        return func
+    return sub
 
 class RestObject(object):
     u"""Prototipo de un objeto REST para construir un nodo en el API, se deben de implementar sus procesos"""
     def __init__(self):
         self.get_functions = {}
+        self.post_functions = {}
+        self.put_functions = {}
+        self.delete_functions = {}
         for func in inspect.getmembers(self, inspect.ismethod):
             try:
                 if func[1].method == 'get':
                     self.get_functions[func[1].type] = func[1]
+                if func[1].method == 'post':
+                    self.post_functions[func[1].type] = func[1]
+                if func[1].method == 'put':
+                    self.put_functions[func[1].type] = func[1]
+                if func[1].method == 'delete':
+                    self.delete_functions[func[1].type] = func[1]
             except AttributeError:
                 pass 
     
@@ -63,21 +89,21 @@ class RestObject(object):
                 func = self.get_functions[self._prepare_id(type)]
             except KeyError:
                 return # Aquí debe haber un error 404
-        return func(self._prepare_id(element))
+        return self._response(func(self._prepare_id(element)))
     
-    def POST(self, element=None):
+    def POST(self, element=None, type=None):
         u"""Devuelve la respuesta al método POST del protocolo HTTP"""
-        try:
-            self.authenticate('POST')
+        if(type is None or type == '/'):
             if(element is None or element == '/'):
-                return self._response(self.insert())
+                func = self.post_functions['_all']
             else:
-                return self._response(self.insert_into(self._prepare_id(element)))
-        except auth.AuthError as e:
-            web.webapi.unauthorized()
-            return self._response(self._resp_error(e.__str__(), str(type(e))))
-        except Exception as e:
-            return self._response(self._resp_error(e.__str__(), str(type(e))))
+                func = self.post_functions['_default']
+        else:
+            try:
+                func = self.post_functions[self._prepare_id(type)]
+            except KeyError:
+                return # Aquí debe haber un error 404
+        return self._response(func(self._prepare_id(element)))
     
     def PUT(self, element=None):
         u"""Devuelve la respuesta al método PUT del protocolo HTTP"""
