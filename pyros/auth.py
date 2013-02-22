@@ -5,6 +5,7 @@ u"""Procesos de autenticacion."""
 ## @author: Andrés Javier López <ajavier.lopez@gmail.com>
 
 import hashlib, hmac, datetime
+import web
 from decorations import base_decorator
 
 class AuthError (Exception):
