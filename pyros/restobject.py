@@ -16,8 +16,8 @@ debug_info = False
 @base_decorator
 def get(f):
     assert(inspect.isfunction(f))
-    def func(*args, **kwargs):
-        return f(*args, **kwargs)
+    def func(self, *args, **kwargs):
+        return f(self, *args, **kwargs)
     func.method = 'GET'
     func.type = '_default'
     return func
@@ -27,8 +27,8 @@ def get_list(type):
     @base_decorator
     def sub(f):
         assert(inspect.isfunction(f))
-        def func(*args, **kwargs):
-            return f(*args, **kwargs)
+        def func(self, *args, **kwargs):
+            return f(self, *args, **kwargs)
         func.method = 'GET'
         func.type = type
         return func
@@ -37,8 +37,8 @@ def get_list(type):
 @base_decorator
 def get_all(f):
     assert(inspect.isfunction(f))
-    def func(element, *args, **kwargs):
-        return f(*args, **kwargs)
+    def func(self, element, *args, **kwargs):
+        return f(self, *args, **kwargs)
     func.method = 'GET'
     func.type = '_all'
     return func
@@ -46,8 +46,8 @@ def get_all(f):
 @base_decorator
 def post(f):
     assert(inspect.isfunction(f))
-    def func(element, *args, **kwargs):
-        return f(*args, **kwargs)
+    def func(self, element, *args, **kwargs):
+        return f(self, *args, **kwargs)
     func.method = 'POST'
     func.type = '_all'
     return func
@@ -55,8 +55,8 @@ def post(f):
 @base_decorator
 def post_into(f):
     assert(inspect.isfunction(f))
-    def func(*args, **kwargs):
-        return f(*args, **kwargs)
+    def func(self, *args, **kwargs):
+        return f(self, *args, **kwargs)
     func.method = 'POST'
     func.type = '_default'
     return func
@@ -65,8 +65,8 @@ def post_list(type):
     assert(not inspect.isfunction(type))
     @base_decorator
     def sub(f):
-        def func(*args, **kwargs):
-            return f(*args, **kwargs)
+        def func(self, *args, **kwargs):
+            return f(self, *args, **kwargs)
         func.method = 'POST'
         func.type = type
         return func
@@ -75,8 +75,8 @@ def post_list(type):
 @base_decorator
 def put_all(f):
     assert(inspect.isfunction(f))
-    def func(element, *args, **kwargs):
-        return f(*args, **kwargs)
+    def func(self, element, *args, **kwargs):
+        return f(self, *args, **kwargs)
     func.method = 'PUT'
     func.type = '_all'
     return func
@@ -84,8 +84,8 @@ def put_all(f):
 @base_decorator
 def put(f):
     assert(inspect.isfunction(f))
-    def func(*args, **kwargs):
-        return f(*args, **kwargs)
+    def func(self, *args, **kwargs):
+        return f(self, *args, **kwargs)
     func.method = 'PUT'
     func.type = '_default'
     return func
@@ -95,8 +95,8 @@ def put_list(type):
     @base_decorator
     def sub(f):
         assert(inspect.isfunction(f))
-        def func(*args, **kwargs):
-            return f(*args, **kwargs)
+        def func(self, *args, **kwargs):
+            return f(self, *args, **kwargs)
         func.method = 'PUT'
         func.type = type
         return func
@@ -105,8 +105,8 @@ def put_list(type):
 @base_decorator
 def delete_all(f):
     assert(inspect.isfunction(f))
-    def func(element, *args, **kwargs):
-        return f(*args, **kwargs)
+    def func(self, element, *args, **kwargs):
+        return f(self, *args, **kwargs)
     func.method = 'DELETE'
     func.type = '_all'
     return func
@@ -114,8 +114,8 @@ def delete_all(f):
 @base_decorator
 def delete(f):
     assert(inspect.isfunction(f))
-    def func(*args, **kwargs):
-        return f(*args, **kwargs)
+    def func(self, *args, **kwargs):
+        return f(self, *args, **kwargs)
     func.method = 'DELETE'
     func.type = '_default'
     return func
@@ -125,8 +125,8 @@ def delete_list(type):
     @base_decorator
     def sub(f):
         assert(inspect.isfunction(f))
-        def func(*args, **kwargs):
-            return f(*args, **kwargs)
+        def func(self, *args, **kwargs):
+            return f(self, *args, **kwargs)
         func.method = 'DELETE'
         func.type = type
         return func
