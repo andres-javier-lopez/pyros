@@ -12,6 +12,7 @@ import pyros.urlmapper
 urlmap = pyros.urlmapper.URL()
 urlmap.add('/', 'test.simple.Start')
 urlmap.add('/basic', 'test.simple.Basic')
+urlmap.add('/auth', 'test.simple.Authenticated')
 urlmap.add('/test/database', 'test.database.Test')
 urls = urlmap.get_map()
 

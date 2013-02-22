@@ -6,7 +6,7 @@ Created on 12/06/2012
 @author: Andrés Javier López <ajavier.lopez@gmail.com>
 @version: 1.0
 '''
-from pyros import restobject 
+from pyros import restobject, auth
 
 class Start(object):
     def GET(self,a,b):
@@ -60,4 +60,11 @@ class Basic(restobject.RestObject):
     @restobject.delete_list("valores")
     def prueba_delete_valores(self, elemento):
         return "borrando los valores de " + elemento
+
+auth_key = "1234"
+class Authenticated(restobject.RestObject):
+    @auth.auth(auth_key)
+    @restobject.get_all
+    def prueba_autenticacion(self):
+        return "ok"
     
