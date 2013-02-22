@@ -155,10 +155,13 @@ class RestObject(object):
     def GET(self, element=None, type=None):
         u"""Devuelve la respuesta al método GET del protocolo HTTP"""
         if(type is None or type == '/'):
-            if(element is None or element == '/'):
-                func = self.get_functions['_all']
-            else:
-                func = self.get_functions['_default']
+            try:
+                if(element is None or element == '/'):
+                    func = self.get_functions['_all']
+                else:
+                    func = self.get_functions['_default']
+            except KeyError:
+                return # 404
         else:
             try:
                 func = self.get_functions[self._prepare_id(type)]
@@ -169,10 +172,13 @@ class RestObject(object):
     def POST(self, element=None, type=None):
         u"""Devuelve la respuesta al método POST del protocolo HTTP"""
         if(type is None or type == '/'):
-            if(element is None or element == '/'):
-                func = self.post_functions['_all']
-            else:
-                func = self.post_functions['_default']
+            try:
+                if(element is None or element == '/'):
+                    func = self.post_functions['_all']
+                else:
+                    func = self.post_functions['_default']
+            except KeyError:
+                return # 404
         else:
             try:
                 func = self.post_functions[self._prepare_id(type)]
@@ -183,10 +189,13 @@ class RestObject(object):
     def PUT(self, element=None, type=None):
         u"""Devuelve la respuesta al método PUT del protocolo HTTP"""
         if(type is None or type == '/'):
-            if(element is None or element == '/'):
-                func = self.put_functions['_all']
-            else:
-                func = self.put_functions['_default']
+            try:
+                if(element is None or element == '/'):
+                    func = self.put_functions['_all']
+                else:
+                    func = self.put_functions['_default']
+            except KeyError:
+                return # 404
         else:
             try:
                 func = self.put_functions[self._prepare_id(type)]
@@ -197,10 +206,13 @@ class RestObject(object):
     def DELETE(self, element=None, type=None):
         u"""Devuelve la respuesta al método DELETE del protocolo HTTP"""
         if(type is None or type == '/'):
-            if(element is None or element == '/'):
-                func = self.delete_functions['_all']
-            else:
-                func = self.delete_functions['_default']
+            try:
+                if(element is None or element == '/'):
+                    func = self.delete_functions['_all']
+                else:
+                    func = self.delete_functions['_default']
+            except KeyError:
+                return # 404
         else:
             try:
                 func = self.delete_functions[self._prepare_id(type)]
