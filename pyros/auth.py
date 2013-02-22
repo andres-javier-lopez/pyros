@@ -12,7 +12,7 @@ class AuthError (Exception):
     u"""Error estándar de autenticación"""
     pass
 
-def auth(secret_key, algorithm = hashlib.sha256):
+def auth(method, secret_key, algorithm = hashlib.sha256):
     @base_decorator
     def fauth(f):
         def func(*args, **kwargs):
@@ -34,7 +34,7 @@ def auth(secret_key, algorithm = hashlib.sha256):
                         sep = '&'
             
             if(not authobj.is_valid(datastring, signature, timestamp)):
-                raise AuthError()
+                raise AuthError(u"Autenticación no válida")
             return f(*args, **kwargs)
         return func
     return fauth
@@ -51,7 +51,7 @@ class Auth:
             return True
         
         diff = datetime.datetime.utcnow() - datetime.datetime.utcfromtimestamp(float(timestamp))
-        if(diff < 0 or diff > datetime.timedelta(minutes=5)):
+        if(diff < datetime.timedelta() or diff > datetime.timedelta(minutes=5)):
             return False
         
         if(hashed == hmac.new(self.key, data, self.algorithm).hexdigest()):
