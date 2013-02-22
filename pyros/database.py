@@ -163,7 +163,7 @@ class Model(object):
             fields = map(self._suffix, self.fields)
             fields = web.db.sqllist(fields)
         
-        where = self.primary + ' = ' + id_data
+        where = self.primary + ' = "' + id_data + '"'
         result = self.db.select(self.table, what = fields, where = self._suffix(where, False), _test = self._test )
         if(len(result) == 1):
             data = result[0]
@@ -194,7 +194,7 @@ class Model(object):
         
         table_fields = map(self._suffix, table_fields)
         fields = web.db.sqllist(table_fields)
-        sql = "SELECT " + fields + " FROM " + self.table + join_cond + " WHERE " + self.table + '.' + self._suffix(self.primary, False) + " = " + id_data
+        sql = "SELECT " + fields + " FROM " + self.table + join_cond + " WHERE " + self.table + '.' + self._suffix(self.primary, False) + " = '" + id_data + "'"
         result = self.db.query(sql)
         if(len(result) == 1):
             data = result[0]
@@ -218,12 +218,12 @@ class Model(object):
         vals = []
         for key  in values.keys():
             vals.append( self._get_field(key) +' = $'+key )
-        query = 'UPDATE ' + self.table + ' SET ' + web.db.sqllist(vals) + ' WHERE `' + self._suffix(self.primary, False) + '` = ' + id_data
+        query = 'UPDATE ' + self.table + ' SET ' + web.db.sqllist(vals) + ' WHERE `' + self._suffix(self.primary, False) + '` = "' + id_data + '"'
         self.db.query(query, vars=values, _test = self._test)
     
     def delete(self, id_data):
         u"""Elimina un registro en la tabla"""
-        where = self._suffix(self.primary, False) + ' = $id_data'
+        where = self._suffix(self.primary, False) + ' = "$id_data"'
         self.db.delete(self.table, where=where, vars={'id_data': id_data})
     
 
