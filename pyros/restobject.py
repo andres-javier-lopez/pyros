@@ -63,6 +63,66 @@ def post_into(type='_default'):
         return func
     return sub
 
+@base_decorator
+def put(f):
+    assert(inspect.isfunction(f))
+    def func(element, *args, **kwargs):
+        return f(*args, **kwargs)
+    func.method = 'put'
+    func.type = '_all'
+    return func
+
+@base_decorator
+def put_element(f):
+    assert(inspect.isfunction(f))
+    def func(*args, **kwargs):
+        return f(*args, **kwargs)
+    func.method = 'put'
+    func.type = '_default'
+    return func
+
+def put_list(type):
+    assert(not inspect.isfunction(type))
+    @base_decorator
+    def sub(f):
+        assert(inspect.isfunction(f))
+        def func(*args, **kwargs):
+            return f(*args, **kwargs)
+        func.method = 'put'
+        func.type = type
+        return func
+    return sub
+
+@base_decorator
+def delete(f):
+    assert(inspect.isfunction(f))
+    def func(element, *args, **kwargs):
+        return f(*args, **kwargs)
+    func.method = 'delete'
+    func.type = '_all'
+    return func
+
+@base_decorator
+def delete_element(f):
+    assert(inspect.isfunction(f))
+    def func(*args, **kwargs):
+        return f(*args, **kwargs)
+    func.method = 'delete'
+    func.type = '_default'
+    return func
+
+def delete_list(type):
+    assert(not inspect.isfunction(type))
+    @base_decorator
+    def sub(f):
+        assert(inspect.isfunction(f))
+        def func(*args, **kwargs):
+            return f(*args, **kwargs)
+        func.method = 'delete'
+        func.type = type
+        return func
+    return sub
+
 class RestObject(object):
     u"""Prototipo de un objeto REST para construir un nodo en el API, se deben de implementar sus procesos"""
     def __init__(self):
@@ -112,33 +172,33 @@ class RestObject(object):
                 return # Aquí debe haber un error 404
         return self._response(func(self._prepare_id(element)))
     
-    def PUT(self, element=None):
+    def PUT(self, element=None, type=None):
         u"""Devuelve la respuesta al método PUT del protocolo HTTP"""
-        try:
-            self.authenticate('PUT')
+        if(type is None or type == '/'):
             if(element is None or element == '/'):
-                return self._response(self.replace())
+                func = self.put_functions['_all']
             else:
-                return self._response(self.update_element(self._prepare_id(element)))
-        except auth.AuthError as e:
-            web.webapi.unauthorized()
-            return self._response(self._resp_error(e.__str__(), str(type(e))))
-        except Exception as e:
-            return self._response(self._resp_error(e.__str__(), str(type(e))))
+                func = self.put_functions['_default']
+        else:
+            try:
+                func = self.put_functions[self._prepare_id(type)]
+            except KeyError:
+                return # Aquí debe haber un error 404
+        return self._response(func(self._prepare_id(element)))
     
-    def DELETE(self, element=None):
+    def DELETE(self, element=None, type=None):
         u"""Devuelve la respuesta al método DELETE del protocolo HTTP"""
-        try:
-            self.authenticate('DELETE')
+        if(type is None or type == '/'):
             if(element is None or element == '/'):
-                return self._response(self.delete())
+                func = self.delete_functions['_all']
             else:
-                return self._response(self.delete_element(self._prepare_id(element)))
-        except auth.AuthError as e:
-            web.webapi.unauthorized()
-            return self._response(self._resp_error(e.__str__(), str(type(e))))
-        except Exception as e:
-            return self._response(self._resp_error(e.__str__(), str(type(e))))
+                func = self.delete_functions['_default']
+        else:
+            try:
+                func = self.delete_functions[self._prepare_id(type)]
+            except KeyError:
+                return # Aquí debe haber un error 404
+        return self._response(func(self._prepare_id(element)))
     
     def _response(self, data):
         u"""Convierte el diccionario proporcionado en una respuesta del tipo JSON"""
@@ -168,35 +228,3 @@ class RestObject(object):
             resp['debug'] = debug
             traceback.print_exc()
         return resp
-    
-    def read(self):
-        u"""Devuelve una lista de elementos en el nodo actual"""
-        pass
-    
-    def insert(self):
-        u"""Ingresa un nuevo elemento al nodo actual"""
-        pass
-    
-    def replace(self):
-        u"""Reemplaza completamente el nodo actual"""
-        pass
-    
-    def delete(self):
-        u"""Elimina completamente el nodo actual"""
-        pass
-    
-    def get_element(self, id_element):
-        u"""Devuelve el elemento específicado perteneciente al nodo actual"""
-        pass
-    
-    def insert_into(self, id_element):
-        u"""Ingresa un subelemento al elemento especificado dentro del nodo"""
-        pass
-    
-    def update_element(self, id_element):
-        u"""Actualiza el elemento específicado en el nodo actual"""
-        pass
-    
-    def delete_element(self, id_element):
-        u"""Elimina el elemento específicado dentro del nodo"""
-        pass
