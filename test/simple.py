@@ -66,5 +66,19 @@ class Authenticated(restobject.RestObject):
     @auth.auth(auth_key)
     @restobject.get_all
     def prueba_autenticacion(self):
-        return "ok"
+        return "autorizado GET"
     
+    @auth.auth(auth_key)
+    @restobject.post
+    def prueba_auth_post(self):
+        return "autorizado POST"
+    
+    @auth.auth(auth_key)
+    @restobject.put_all
+    def prueba_auth_put(self):
+        return "autorizado PUT"
+    
+    @auth.auth(auth_key)
+    @restobject.delete_all
+    def prueba_auth_del(self):
+        return "autorizado DELETE"

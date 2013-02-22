@@ -15,6 +15,7 @@ class Test(object):
         self.c = pycurl.Curl()
         self.c.setopt(pycurl.FOLLOWLOCATION, 1)
         self.c.setopt(pycurl.MAXREDIRS, 5)
+        self.methods = ['GET', 'POST', 'PUT', 'DELETE']
     
     def run(self):
         self.restobject_test()
@@ -25,18 +26,18 @@ class Test(object):
         req = ['', rand, rand + '/valores']
         for r in req:
             self._set_request(url + 'basic/' + r)
-            methods = ['GET', 'POST', 'PUT', 'DELETE']
-            for method in methods:
+            for method in self.methods:
                 self.c.setopt(pycurl.CUSTOMREQUEST, method)
                 self._print_results()
     
     def auth_test(self):
-        timestamp = str(int(time.time()))
-        datastring = "GET /auth/?timestamp=" + timestamp
-        hash = hmac.new(auth_key, datastring, hashlib.sha256).hexdigest()
-        self._set_request(url + 'auth/?timestamp=' + timestamp + '&signature=' + hash)
-        self.c.setopt(pycurl.CUSTOMREQUEST, 'GET')
-        self._print_results()
+        for method in self.methods:
+            timestamp = str(int(time.time()))
+            datastring = method + " /auth/?timestamp=" + timestamp
+            hash = hmac.new(auth_key, datastring, hashlib.sha256).hexdigest()
+            self._set_request(url + 'auth/?timestamp=' + timestamp + '&signature=' + hash)
+            self.c.setopt(pycurl.CUSTOMREQUEST, method)
+            self._print_results()
         
     def _set_request(self, request):
         self.c.setopt(pycurl.URL, request)
