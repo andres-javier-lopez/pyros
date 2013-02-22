@@ -15,70 +15,70 @@ class Start(object):
 class Basic(restobject.RestObject):
     @restobject.get_all
     def listar(self):
-        return "lista de elementos"
+        return self._resp("mensaje", "lista de elementos")
     
     @restobject.get
     def element(self, elemento):
-        return "elemento: " + elemento
+        return self._resp("mensaje", "elemento: " + elemento)
     
     @restobject.get_list("valores")
     def valores(self, elemento):
-        return "valores de " + elemento
+        return self._resp("mensaje", "valores de " + elemento)
     
     @restobject.post
     def prueba_post(self):
-        return "insertando elemento"
+        return self._resp("mensaje", "insertando elemento")
     
     @restobject.post_into
     def prueba_post_general(self, elemento):
-        return "insertando en " + elemento
+        return self._resp("mensaje", "insertando en " + elemento)
     
     @restobject.post_list("valores")
     def prueba_post_valores(self, elemento):
-        return "insertando valores de " + elemento
+        return self._resp("mensaje", "insertando valores de " + elemento)
     
     @restobject.put_all
     def prueba_put(self):
-        return "reemplazando todo"
+        return self._resp("mensaje", "reemplazando todo")
     
     @restobject.put
     def prueba_put_element(self, elemento):
-        return "reemplazando " + elemento
+        return self._resp("mensaje", "reemplazando " + elemento)
     
     @restobject.put_list("valores")
     def prueba_put_valores(self, elemento):
-        return "reemplazando valores de " + elemento
+        return self._resp("mensaje", "reemplazando valores de " + elemento)
     
     @restobject.delete_all
     def prueba_delete(self):
-        return "borrando todo"
+        return self._resp("mensaje", "borrando todo")
     
     @restobject.delete
     def prueba_delete_element(self, elemento):
-        return "borrando elemento " + elemento
+        return self._resp("mensaje", "borrando elemento " + elemento)
     
     @restobject.delete_list("valores")
     def prueba_delete_valores(self, elemento):
-        return "borrando los valores de " + elemento
+        return self._resp("mensaje", "borrando los valores de " + elemento)
 
 auth_key = "1234"
 class Authenticated(restobject.RestObject):
     @auth.auth(auth_key)
     @restobject.get_all
     def prueba_autenticacion(self):
-        return "autorizado GET"
+        return self._resp("mensaje", "autorizado GET")
     
     @auth.auth(auth_key)
     @restobject.post
     def prueba_auth_post(self):
-        return "autorizado POST"
+        return self._resp("mensaje", "autorizado POST")
     
     @auth.auth(auth_key)
     @restobject.put_all
     def prueba_auth_put(self):
-        return "autorizado PUT"
+        return self._resp("mensaje", "autorizado PUT")
     
     @auth.auth(auth_key)
     @restobject.delete_all
     def prueba_auth_del(self):
-        return "autorizado DELETE"
+        return self._resp("mensaje", "autorizado DELETE")
