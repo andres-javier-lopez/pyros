@@ -132,7 +132,6 @@ class RestObject(object):
         self.delete_functions = {}
         for func in inspect.getmembers(self, inspect.ismethod):
             try:
-                assert(inspect.isfunction(func[1]))
                 if func[1].method == 'get':
                     self.get_functions[func[1].type] = func[1]
                 if func[1].method == 'post':
