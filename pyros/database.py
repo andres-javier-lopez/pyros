@@ -223,7 +223,7 @@ class Model(object):
     
     def delete(self, id_data):
         u"""Elimina un registro en la tabla"""
-        where = self._suffix(self.primary, False) + ' = "$id_data"'
+        where = self._suffix(self.primary, False) + ' = $id_data'
         self.db.delete(self.table, where=where, vars={'id_data': id_data})
     
 
@@ -354,7 +354,7 @@ class Datamap(object):
         for element in main_list:
             for sub in self.joins:
                 submap = sub['datamap']
-                where = sub['join_field'] + ' = ' + getattr(element, sub['join_key']).__str__()
+                where = sub['join_field'] + ' = "' + getattr(element, sub['join_key']).__str__() + '"'
                 submap.add_where(where)
                 setattr(element, sub['tag'], submap.read())
         return main_list
@@ -368,7 +368,7 @@ class Datamap(object):
         if(data != {}):
             for sub in self.joins:
                 submap = sub['datamap']
-                where = sub['join_field'] + ' = ' + getattr(data, sub['join_key']).__str__()
+                where = sub['join_field'] + ' = "' + getattr(data, sub['join_key']).__str__() + '"'
                 submap.add_where(where)
                 setattr(data, sub['tag'], submap.read())
         return data
