@@ -12,7 +12,7 @@ class AuthError (Exception):
     u"""Error estándar de autenticación"""
     pass
 
-def auth(method, secret_key, algorithm = hashlib.sha256):
+def auth(secret_key, method='', algorithm = hashlib.sha256):
     @base_decorator
     def fauth(f):
         def func(*args, **kwargs):
@@ -21,11 +21,19 @@ def auth(method, secret_key, algorithm = hashlib.sha256):
                 signature = data.signature
                 timestamp = data.timestamp
             except AttributeError:
-                raise AuthError()
+                raise AuthError(u"Falta información de autenticación")
                 
             authobj = Auth(secret_key, algorithm)
             
-            datastring = method + ' ' + web.ctx.path
+            if(method == ''):
+                try:
+                    met = f.method
+                except AttributeError:
+                    raise AuthError(u"No se específico un método")
+            else:
+                met = method
+            
+            datastring = met + ' ' + web.ctx.path
             sep = '?'
             for key in sorted(data.iterkeys()):
                 if(key != 'signature'):

@@ -18,7 +18,7 @@ def get(f):
     assert(inspect.isfunction(f))
     def func(*args, **kwargs):
         return f(*args, **kwargs)
-    func.method = 'get'
+    func.method = 'GET'
     func.type = '_default'
     return func
 
@@ -29,7 +29,7 @@ def get_list(type):
         assert(inspect.isfunction(f))
         def func(*args, **kwargs):
             return f(*args, **kwargs)
-        func.method = 'get'
+        func.method = 'GET'
         func.type = type
         return func
     return sub
@@ -39,7 +39,7 @@ def get_all(f):
     assert(inspect.isfunction(f))
     def func(element, *args, **kwargs):
         return f(*args, **kwargs)
-    func.method = 'get'
+    func.method = 'GET'
     func.type = '_all'
     return func
 
@@ -48,7 +48,7 @@ def post(f):
     assert(inspect.isfunction(f))
     def func(element, *args, **kwargs):
         return f(*args, **kwargs)
-    func.method = 'post'
+    func.method = 'POST'
     func.type = '_all'
     return func
 
@@ -57,7 +57,7 @@ def post_into(f):
     assert(inspect.isfunction(f))
     def func(*args, **kwargs):
         return f(*args, **kwargs)
-    func.method = 'post'
+    func.method = 'POST'
     func.type = '_default'
     return func
 
@@ -67,7 +67,7 @@ def post_list(type):
     def sub(f):
         def func(*args, **kwargs):
             return f(*args, **kwargs)
-        func.method = 'post'
+        func.method = 'POST'
         func.type = type
         return func
     return sub
@@ -77,7 +77,7 @@ def put_all(f):
     assert(inspect.isfunction(f))
     def func(element, *args, **kwargs):
         return f(*args, **kwargs)
-    func.method = 'put'
+    func.method = 'PUT'
     func.type = '_all'
     return func
 
@@ -86,7 +86,7 @@ def put(f):
     assert(inspect.isfunction(f))
     def func(*args, **kwargs):
         return f(*args, **kwargs)
-    func.method = 'put'
+    func.method = 'PUT'
     func.type = '_default'
     return func
 
@@ -97,7 +97,7 @@ def put_list(type):
         assert(inspect.isfunction(f))
         def func(*args, **kwargs):
             return f(*args, **kwargs)
-        func.method = 'put'
+        func.method = 'PUT'
         func.type = type
         return func
     return sub
@@ -107,7 +107,7 @@ def delete_all(f):
     assert(inspect.isfunction(f))
     def func(element, *args, **kwargs):
         return f(*args, **kwargs)
-    func.method = 'delete'
+    func.method = 'DELETE'
     func.type = '_all'
     return func
 
@@ -116,7 +116,7 @@ def delete(f):
     assert(inspect.isfunction(f))
     def func(*args, **kwargs):
         return f(*args, **kwargs)
-    func.method = 'delete'
+    func.method = 'DELETE'
     func.type = '_default'
     return func
 
@@ -127,7 +127,7 @@ def delete_list(type):
         assert(inspect.isfunction(f))
         def func(*args, **kwargs):
             return f(*args, **kwargs)
-        func.method = 'delete'
+        func.method = 'DELETE'
         func.type = type
         return func
     return sub
@@ -141,13 +141,13 @@ class RestObject(object):
         self.delete_functions = {}
         for func in inspect.getmembers(self, inspect.ismethod):
             try:
-                if func[1].method == 'get':
+                if func[1].method == 'GET':
                     self.get_functions[func[1].type] = func[1]
-                if func[1].method == 'post':
+                if func[1].method == 'POST':
                     self.post_functions[func[1].type] = func[1]
-                if func[1].method == 'put':
+                if func[1].method == 'PUT':
                     self.put_functions[func[1].type] = func[1]
-                if func[1].method == 'delete':
+                if func[1].method == 'DELETE':
                     self.delete_functions[func[1].type] = func[1]
             except AttributeError:
                 pass 
