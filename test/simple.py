@@ -8,8 +8,11 @@ Created on 12/06/2012
 '''
 from pyros import restobject 
 
+class Start(object):
+    def GET(self,a,b):
+        return "Pruebas de funcionamiento de PyROS"
 
-class Test(restobject.RestObject):
+class Basic(restobject.RestObject):
     @restobject.get_all
     def listar(self):
         return "lista de elementos"

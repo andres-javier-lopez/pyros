@@ -5,7 +5,7 @@ import StringIO
 import random
 import string
 
-request = "http://localhost:8080/try/"
+request = "http://localhost:8080/basic/"
 
 class Test(object):
     def __init__(self):
