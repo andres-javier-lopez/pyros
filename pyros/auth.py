@@ -5,10 +5,38 @@ u"""Procesos de autenticacion."""
 ## @author: Andrés Javier López <ajavier.lopez@gmail.com>
 
 import hashlib, hmac, datetime
+from decorations import base_decorator
 
 class AuthError (Exception):
     u"""Error estándar de autenticación"""
     pass
+
+def auth(secret_key, algorithm = hashlib.sha256):
+    @base_decorator
+    def fauth(f):
+        def func(*args, **kwargs):
+            data = web.input()
+            try:
+                signature = data.signature
+                timestamp = data.timestamp
+            except AttributeError:
+                raise AuthError()
+                
+            authobj = Auth(secret_key, algorithm)
+            
+            datastring = method + ' ' + web.ctx.path
+            sep = '?'
+            for key in sorted(data.iterkeys()):
+                if(key != 'signature'):
+                    datastring +=  sep + key + '=' + data[key]
+                    if(sep == '?'):
+                        sep = '&'
+            
+            if(not authobj.is_valid(datastring, signature, timestamp)):
+                raise AuthError()
+            return f(*args, **kwargs)
+        return func
+    return fauth
 
 class Auth:
     u"""Sistema de autenticación"""
