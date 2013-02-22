@@ -63,7 +63,7 @@ class Basic(restobject.RestObject):
 
 auth_key = "1234"
 class Authenticated(restobject.RestObject):
-    @auth.auth(auth_key)
+    @auth.auth("GET", auth_key)
     @restobject.get_all
     def prueba_autenticacion(self):
         return "ok"
