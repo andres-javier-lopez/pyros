@@ -28,18 +28,38 @@ class Test(object):
         req = ['', rand, rand + '/valores']
         for r in req:
             for method in self.methods:
-                self._make_request('basic/' + r, method)
+                print self._make_request('basic/' + r, method)['mensaje']
     
     def auth_test(self):
         for method in self.methods:
             timestamp = str(int(time.time()))
             datastring = method + " /auth/?timestamp=" + timestamp
             hash = hmac.new(auth_key, datastring, hashlib.sha256).hexdigest()
-            self._make_request('auth/?timestamp=' + timestamp + '&signature=' + hash, method)
+            print self._make_request('auth/?timestamp=' + timestamp + '&signature=' + hash, method)['mensaje']
     
     def database_test(self):
         data = json.dumps({"valor1": "test", "valor2": "5" })
-        self._make_request('test1', 'POST', body=data)
+        result = self._make_request('test1', 'POST', body=data)
+        assert(result['success'])
+        print "insertado elemento"
+        result = self._make_request('test1', 'GET')
+        id_result = result['elementos'][-1]['id_test']
+        print "el id es " + str(id_result)
+        result = self._make_request('test1/' + str(id_result), 'GET')
+        assert(result['elemento']['valor1'] == "test")
+        assert(result['elemento']['valor2'] == "5")
+        print "comparado elemento"
+        data = json.dumps({"valor1": "test2", "valor2": 7})
+        result = self._make_request('test1/' + str(id_result), 'PUT', body=data)
+        assert(result['success'])
+        print "reemplazados valores"
+        result = self._make_request('test1/' + str(id_result), 'GET')
+        assert(result['elemento']['valor1'] == "test2")
+        assert(result['elemento']['valor2'] == "7")
+        print "verificado reemplazo"
+        result = self._make_request('test1/' + str(id_result), 'DELETE')
+        assert(result['success'])
+        print "elemento eliminado"
     
     def _make_request(self, url_string, method, body = None):
         self._set_request(url + url_string)
@@ -48,17 +68,18 @@ class Test(object):
             self.c.setopt(pycurl.POSTFIELDS, body)
         else:
             self.c.setopt(pycurl.POSTFIELDS, "")
-        self._print_results()
+        return json.loads(self._get_results())
         
     def _set_request(self, request):
         self.c.setopt(pycurl.URL, request)
     
-    def _print_results(self):
+    def _get_results(self):
         b = StringIO.StringIO()
         self.c.setopt(pycurl.WRITEFUNCTION, b.write)
         self.c.perform()
-        print b.getvalue()
+        value = b.getvalue()
         b.close()
+        return value
 
 if __name__ == '__main__':
     test = Test()
