@@ -245,7 +245,7 @@ class Dataset(object):
     def _suffix(self, str_val):
         return str_val.replace('#s', '')
     
-    def _load_JSON(self, json_data, index=None, strict=True):
+    def _load_JSON(self, json_data, index=None):
         u"""Obtiene datos del registro proporcionados en formato JSON"""
         try:
             self.json_data = json.loads(json_data)
@@ -254,19 +254,18 @@ class Dataset(object):
             raise DatasetError(u'No se pudo decodificar el JSON')
             
         if(index is None):
-            self._load_data(self.json_data, strict)
+            self._load_data(self.json_data)
         else:
-            self._load_data(self.json_data[index], strict)
+            self._load_data(self.json_data[index])
     
-    def _load_data(self, data, strict=True):
+    def _load_data(self, data):
         u"""Obtiene datos del registro proporcionados en un diccionario"""
         for field in self.fields:
             try:
                 field = self._suffix(field)
                 self.values[field] = data[field]
             except KeyError:
-                if(strict):
-                    raise DatasetError(u'El campo ' + field + ' no fue proporcionado')
+                pass # Ignoramos si un campo no está entre los datos
             
     def _read_data(self):
         u"""Devuelve la lista de campos y datos correspondiente al registro"""
@@ -301,7 +300,7 @@ class Dataset(object):
         if(len(self.values) == 0):
             self.get_data(id_data)
         if(data != ''):
-            self._load_JSON(data, strict=False)
+            self._load_JSON(data)
         model = Model(self.table, self.primary, self.fields, suffix = self.suffix)
         model.update(id_data, self.values)
         return True
