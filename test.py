@@ -42,34 +42,54 @@ class Test(object):
         result = self._make_request('test1', 'POST', body=data)
         assert(result['success'])
         print "insertado elemento"
+        
         result = self._make_request('test1', 'GET')
         id_result = result['elementos'][-1]['id_test']
         print "el id es " + str(id_result)
+        
         result = self._make_request('test1/' + str(id_result), 'GET')
         assert(result['elemento']['valor1'] == "test")
         assert(result['elemento']['valor2'] == "5")
         print "comparado elemento"
+        
+        result = self._make_request('test1/?search=test', 'GET')
+        id_compare = result['elementos'][-1]['id_test']
+        assert(id_compare == id_result)
+        result = self._make_request('test1/?value=5', 'GET')
+        id_compare = result['elementos'][-1]['id_test']
+        assert(id_compare == id_result)
+        result = self._make_request('test1/?search=test&value=5', 'GET')
+        id_compare = result['elementos'][-1]['id_test']
+        assert(id_compare == id_result)
+        print "buscando elemento"
+        
         data = json.dumps({"valor1": "test2", "valor2": 7})
         result = self._make_request('test1/' + str(id_result), 'PUT', body=data)
         assert(result['success'])
         print "reemplazados valores"
+        
         result = self._make_request('test1/' + str(id_result), 'GET')
         assert(result['elemento']['valor1'] == "test2")
         assert(result['elemento']['valor2'] == "7")
         print "verificado reemplazo"
+        
         data = json.dumps({"prueba": "42"})
         result = self._make_request('test1/' + str(id_result), 'POST', body=data)
         assert(result['success'])
         print "insertado subelemento"
+        
         result = self._make_request('test1/' + str(id_result), 'GET')
         id_sub = result['elemento']['subtest'][-1]['id_test2']
         print "el id del subelemento es " + id_sub
+        
         result = self._make_request('test2/' + str(id_sub), 'GET')
         assert(result['elemento']['prueba'] == "42")
         print "verificado subelemento"
+        
         result = self._make_request('test2/' + str(id_sub), 'DELETE')
         assert(result['success'])
         print "eliminado subelemento"
+        
         result = self._make_request('test1/' + str(id_result), 'DELETE')
         assert(result['success'])
         print "elemento eliminado"
@@ -81,7 +101,13 @@ class Test(object):
             self.c.setopt(pycurl.POSTFIELDS, body)
         else:
             self.c.setopt(pycurl.POSTFIELDS, "")
-        return json.loads(self._get_results())
+        
+        result = self._get_results()
+        try:
+            return json.loads(result)
+        except ValueError:
+            print method + ' ' + url_string + ' ' + str(body)
+            raise Exception('Finalizar ejecución')
         
     def _set_request(self, request):
         self.c.setopt(pycurl.URL, request)

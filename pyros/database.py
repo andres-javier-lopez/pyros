@@ -340,10 +340,22 @@ class Datamap(object):
             
         self.joins.append({'datamap': datamap, 'tag': tag, 'join_field': join_field, 'join_key': join_key})
     
-    def add_where(self, where):
+    def set_where(self, where):
         u"""Establece una condición de búsqueda"""
-        # Esto se puede mejorar en un futuro
         self.where = where
+        
+    def add_where(self, field, value = None):
+        u"""Agrega una condición de búsqueda adicional"""
+        if(value is None):
+            cond = field
+        else:
+            cond = self.model._get_field(field) + ' = "' + value + '"'
+        
+        if(self.where is not None):
+            assert(isinstance(self.where, basestring))
+            self.where += ' AND ' + cond
+        else:
+            self.where = cond
        
     def read(self):
         u"""Devuelve la lista completa de los elementos del mapa"""
@@ -355,7 +367,7 @@ class Datamap(object):
             for sub in self.joins:
                 submap = sub['datamap']
                 where = sub['join_field'] + ' = "' + getattr(element, sub['join_key']).__str__() + '"'
-                submap.add_where(where)
+                submap.set_where(where)
                 setattr(element, sub['tag'], submap.read())
         return main_list
     
@@ -369,7 +381,7 @@ class Datamap(object):
             for sub in self.joins:
                 submap = sub['datamap']
                 where = sub['join_field'] + ' = "' + getattr(data, sub['join_key']).__str__() + '"'
-                submap.add_where(where)
+                submap.set_where(where)
                 setattr(data, sub['tag'], submap.read())
         return data
-        
+

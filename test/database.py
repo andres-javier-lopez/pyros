@@ -21,6 +21,11 @@ class Test(restobject.RestObject):
         
     @restobject.get_all
     def read(self):
+        data = web.input(search=None, value=None)
+        if(data.search is not None):
+            self.datamap.add_where('valor1', data.search)
+        if(data.value is not None):
+            self.datamap.add_where('valor2', data.value)
         return self._resp('elementos', self.datamap.read())
     
     @restobject.post
