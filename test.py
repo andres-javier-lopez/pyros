@@ -57,6 +57,19 @@ class Test(object):
         assert(result['elemento']['valor1'] == "test2")
         assert(result['elemento']['valor2'] == "7")
         print "verificado reemplazo"
+        data = json.dumps({"prueba": "42"})
+        result = self._make_request('test1/' + str(id_result), 'POST', body=data)
+        assert(result['success'])
+        print "insertado subelemento"
+        result = self._make_request('test1/' + str(id_result), 'GET')
+        id_sub = result['elemento']['subtest'][-1]['id_test2']
+        print "el id del subelemento es " + id_sub
+        result = self._make_request('test2/' + str(id_sub), 'GET')
+        assert(result['elemento']['prueba'] == "42")
+        print "verificado subelemento"
+        result = self._make_request('test2/' + str(id_sub), 'DELETE')
+        assert(result['success'])
+        print "eliminado subelemento"
         result = self._make_request('test1/' + str(id_result), 'DELETE')
         assert(result['success'])
         print "elemento eliminado"
