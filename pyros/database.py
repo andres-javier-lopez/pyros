@@ -115,7 +115,7 @@ class Model(object):
         for data in result:
             for key in self.fields:
                 key = key.replace('#s', '')
-                setattr(data, key, str(getattr(data, key)))
+                setattr(data, key, unicode(getattr(data, key)))
             rows.append(data)
         return rows
     
@@ -149,7 +149,7 @@ class Model(object):
         for data in result:
             for key in self.fields:
                 key = key.replace('#s', '')
-                setattr(data, key, str(getattr(data, key)))
+                setattr(data, key, unicode(getattr(data, key)))
             rows.append(data)
         return rows
     
@@ -169,7 +169,7 @@ class Model(object):
             data = result[0]
             for key in self.fields:
                 key = key.replace('#s', '')
-                setattr(data, key, str(getattr(data, key)))
+                setattr(data, key, unicode(getattr(data, key)))
             return data
         else:
             return {}
@@ -200,7 +200,7 @@ class Model(object):
             data = result[0]
             for key in self.fields:
                 key = key.replace('#s', '')
-                setattr(data, key, str(getattr(data, key)))
+                setattr(data, key, unicode(getattr(data, key)))
             return data
         else:
             return {}
