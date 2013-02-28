@@ -38,7 +38,7 @@ class Test(object):
             print self._make_request('auth/?timestamp=' + timestamp + '&signature=' + hash, method)['mensaje']
     
     def database_test(self):
-        data = json.dumps({"valor1": "test", "valor2": "5" })
+        data = json.dumps({"valor1": u"test_á", "valor2": "5" })
         result = self._make_request('test1', 'POST', body=data)
         assert(result['success'])
         print "insertado elemento"
@@ -48,17 +48,17 @@ class Test(object):
         print "el id es " + str(id_result)
         
         result = self._make_request('test1/' + str(id_result), 'GET')
-        assert(result['elemento']['valor1'] == "test")
+        assert(result['elemento']['valor1'] == u"test_á")
         assert(result['elemento']['valor2'] == "5")
         print "comparado elemento"
         
-        result = self._make_request('test1/?search=test', 'GET')
+        result = self._make_request('test1/?search=test_á', 'GET')
         id_compare = result['elementos'][-1]['id_test']
         assert(id_compare == id_result)
         result = self._make_request('test1/?value=5', 'GET')
         id_compare = result['elementos'][-1]['id_test']
         assert(id_compare == id_result)
-        result = self._make_request('test1/?search=test&value=5', 'GET')
+        result = self._make_request('test1/?search=test_á&value=5', 'GET')
         id_compare = result['elementos'][-1]['id_test']
         assert(id_compare == id_result)
         print "buscando elemento"
