@@ -1,22 +1,18 @@
 #coding: utf-8
 
-import pycurl
-import StringIO
 import random
 import string
 import time
 import hashlib, hmac
 import json
+from pyrostest import tester
 
 url = "http://localhost:8080/"
 auth_key = "1234"
 
-class Test(object):
-    def __init__(self):
-        self.c = pycurl.Curl()
-        self.c.setopt(pycurl.FOLLOWLOCATION, 1)
-        self.c.setopt(pycurl.MAXREDIRS, 5)
-        self.methods = ['GET', 'POST', 'PUT', 'DELETE']
+class Test(tester.Request):
+    def __init__(self, url, **kwargs):
+       super(Test, self).__init__(url, **kwargs)
     
     def run(self):
         self.restobject_test()
@@ -93,33 +89,7 @@ class Test(object):
         result = self._make_request('test1/' + str(id_result), 'DELETE')
         assert(result['success'])
         print "elemento eliminado"
-    
-    def _make_request(self, url_string, method, body = None):
-        self._set_request(url + url_string)
-        self.c.setopt(pycurl.CUSTOMREQUEST, method)
-        if(body is not None):
-            self.c.setopt(pycurl.POSTFIELDS, body)
-        else:
-            self.c.setopt(pycurl.POSTFIELDS, "")
-        
-        result = self._get_results()
-        try:
-            return json.loads(result)
-        except ValueError:
-            print method + ' ' + url_string + ' ' + str(body)
-            raise Exception('Finalizar ejecución')
-        
-    def _set_request(self, request):
-        self.c.setopt(pycurl.URL, request)
-    
-    def _get_results(self):
-        b = StringIO.StringIO()
-        self.c.setopt(pycurl.WRITEFUNCTION, b.write)
-        self.c.perform()
-        value = b.getvalue()
-        b.close()
-        return value
 
 if __name__ == '__main__':
-    test = Test()
+    test = Test(url)
     test.run()
