@@ -29,9 +29,9 @@ class Test(tester.Request):
     def auth_test(self):
         for method in self.methods:
             timestamp = str(int(time.time()))
-            datastring = method + " /auth/?timestamp=" + timestamp
-            hash = hmac.new(auth_key, datastring, hashlib.sha256).hexdigest()
-            print self._make_request('auth/?timestamp=' + timestamp + '&signature=' + hash, method)['mensaje']
+            datastring = unicode(method + u" /auth/?data=áéíóúñ&timestamp=" + timestamp)
+            hash = hmac.new(auth_key, datastring.encode('utf-8'), hashlib.sha256).hexdigest()
+            print self._make_request(u"auth/?data=áéíóúñ&timestamp=" + timestamp + '&signature=' + hash, method)['mensaje']
     
     def database_test(self):
         data = json.dumps({"valor1": u"test_á", "valor2": "5" })
@@ -48,13 +48,13 @@ class Test(tester.Request):
         assert(result['elemento']['valor2'] == "5")
         print "comparado elemento"
         
-        result = self._make_request('test1/?search=test_á', 'GET')
+        result = self._make_request(u'test1/?search=test_á', 'GET')
         id_compare = result['elementos'][-1]['id_test']
         assert(id_compare == id_result)
         result = self._make_request('test1/?value=5', 'GET')
         id_compare = result['elementos'][-1]['id_test']
         assert(id_compare == id_result)
-        result = self._make_request('test1/?search=test_á&value=5', 'GET')
+        result = self._make_request(u'test1/?search=test_á&value=5', 'GET')
         id_compare = result['elementos'][-1]['id_test']
         assert(id_compare == id_result)
         print "buscando elemento"

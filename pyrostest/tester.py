@@ -1,6 +1,6 @@
 #coding: utf-8
 
-import pycurl, StringIO, json
+import pycurl, StringIO, json, urllib2
 
 class Request(object):
     def __init__(self, url, **kwargs):
@@ -12,7 +12,7 @@ class Request(object):
         self.methods = ['GET', 'POST', 'PUT', 'DELETE']
     
     def _make_request(self, url_string, method, body = None):
-        self._set_request(self.url + url_string)
+        self._set_request(self.url + urllib2.quote(unicode(url_string).encode('utf-8'), '/?&='))
         self.c.setopt(pycurl.CUSTOMREQUEST, method)
         if(body is not None):
             self.c.setopt(pycurl.POSTFIELDS, body)

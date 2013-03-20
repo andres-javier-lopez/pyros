@@ -37,7 +37,7 @@ def auth(secret_key, method='', algorithm = hashlib.sha256):
             sep = '?'
             for key in sorted(data.iterkeys()):
                 if(key != 'signature'):
-                    datastring +=  sep + key + '=' + data[key]
+                    datastring = datastring + sep + key + '=' + data[key]
                     if(sep == '?'):
                         sep = '&'
             
@@ -62,7 +62,7 @@ class Auth:
         if(diff < datetime.timedelta() or diff > datetime.timedelta(minutes=5)):
             return False
         
-        if(hashed == hmac.new(self.key, data, self.algorithm).hexdigest()):
+        if(hashed == hmac.new(self.key, data.encode('utf-8'), self.algorithm).hexdigest()):
             return True 
         else:
             return False
