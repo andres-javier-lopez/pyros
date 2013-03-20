@@ -36,10 +36,12 @@ def auth(secret_key, method='', algorithm = hashlib.sha256):
             datastring = met + ' ' + web.ctx.path
             sep = '?'
             for key in sorted(data.iterkeys()):
-                if(key != 'signature'):
+                if(key != 'signature' and data[key] != ''):
                     datastring = datastring + sep + key + '=' + data[key]
                     if(sep == '?'):
                         sep = '&'
+            
+            datastring = datastring + ' ' + web.data()
             
             if(not authobj.is_valid(datastring, signature, timestamp)):
                 raise AuthError(u"Autenticación no válida")

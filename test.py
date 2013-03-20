@@ -29,9 +29,10 @@ class Test(tester.Request):
     def auth_test(self):
         for method in self.methods:
             timestamp = str(int(time.time()))
-            datastring = unicode(method + u" /auth/?data=áéíóúñ&timestamp=" + timestamp)
+            data = json.dumps({"prueba": "áéíóúñ"})
+            datastring = unicode(method + u" /auth/?data=áéíóúñ&timestamp=" + timestamp + ' ' + data)
             hash = hmac.new(auth_key, datastring.encode('utf-8'), hashlib.sha256).hexdigest()
-            print self._make_request(u"auth/?data=áéíóúñ&timestamp=" + timestamp + '&signature=' + hash, method)['mensaje']
+            print self._make_request(u"auth/?data=áéíóúñ&timestamp=" + timestamp + '&signature=' + hash, method, body=data)['mensaje']
     
     def database_test(self):
         data = json.dumps({"valor1": u"test_á", "valor2": "5" })
