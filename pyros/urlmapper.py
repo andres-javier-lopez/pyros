@@ -9,6 +9,7 @@ class URL(object):
     def __init__(self):
         u"""Inicializa el mapa de rutas como vacío"""
         self.routemap = ()
+        self(URL, self).__init__()
         
     def add(self, route, handler):
         u"""Agrega un nuevo par ruta/manejador al mapa de rutas"""

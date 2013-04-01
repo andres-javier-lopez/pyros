@@ -151,6 +151,7 @@ class RestObject(object):
                     self.delete_functions[func[1].type] = func[1]
             except AttributeError:
                 pass 
+        super(RestObject, self).__init__()
     
     def GET(self, element=None, type=None):
         u"""Devuelve la respuesta al método GET del protocolo HTTP"""

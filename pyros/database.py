@@ -29,6 +29,7 @@ class Database(object):
     def __init__(self, config):
         u"""Creación de la conexión"""
         self.db = web.database(dbn=config['dbn'], user = config['user'], pw = config['password'], db = config['database'])
+        super(Database, self).__init__()
         
     def get_connection(self):
         u"""Devuelve la conexión activa"""
@@ -55,6 +56,7 @@ class Table(object):
         self.joined = joined
         self.relations = []
         self.suffix = suffix
+        super(Table, self).__init__()
         
     def add_relation(self, tabledata, join_field = None, join_key = None, tag = None):
         self.relations.append({"data": tabledata, "field": join_field, "key": join_key, "tag": tag})
@@ -76,6 +78,7 @@ class Model(object):
         self.suffix = suffix
         self._process_fields(fields)        
         self._test = _test
+        super(Model, self).__init__()
         
     def _process_fields(self, fields):
         for field in fields:
@@ -236,6 +239,7 @@ class Dataset(object):
         self.fields = tabledata.fields
         self.suffix = tabledata.suffix
         self.values = {}
+        super(Dataset, self).__init__()
                 
         if(json_data is not None):
             self._load_JSON(json_data, index)
@@ -322,6 +326,7 @@ class Datamap(object):
         self.joined = tabledata.joined
         self.suffix = tabledata.suffix
         self.model = Model(self.table, self.primary, self.fields, suffix = self.suffix)
+        super(Datamap, self).__init__()
         
         for relation in tabledata.relations:
             self.add_join(Datamap(relation["data"]), relation["field"], relation["key"], relation["tag"])
