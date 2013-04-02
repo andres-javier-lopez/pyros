@@ -82,3 +82,10 @@ class Authenticated(restobject.RestObject):
     @restobject.delete_all
     def prueba_auth_del(self):
         return self._resp("mensaje", "autorizado DELETE")
+    
+credentials = {'username': 'hola', 'password': 'mundo'}
+class HTTPAuth(restobject.RestObject):
+    @auth.http_auth(credentials)
+    @restobject.get_all
+    def prueba_autenticacion(self):
+        return self._resp("mensaje", "autorizado GET por HTTP")

@@ -7,6 +7,7 @@ author: Andrés Javier López <ajavier.lopez@gmail.com>
 """
 
 import hashlib, hmac, datetime
+import re, base64
 import web
 from decorations import base_decorator
 
@@ -63,10 +64,12 @@ def http_auth(credentials):
                 raise AuthError(u"No se autenticó")
             auth = re.sub('^Basic ', '', auth)
             username_auth,password_auth = base64.decodestring(auth).split(':')
-            if username_auth == credentials.username and password_auth == credentials.password:
+            if username_auth == credentials['username'] and password_auth == credentials['password']:
                 return f(*args,**kwargs)
             else:
                 raise AuthError(u"Autenticación no válida")
+        return func
+    return fauth
 
 class Auth(object):
     u"""Realiza el proceso de autenticación"""
