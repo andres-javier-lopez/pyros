@@ -132,9 +132,39 @@ def delete_list(type):
         return func
     return sub
 
-class RestObject(object):
-    u"""Prototipo de un objeto REST para construir un nodo en el API, se deben de implementar sus procesos"""
-    def __init__(self):
+class BaseRestObject(object):
+    u'''Clase base utilizada para permitir herencia múltiple en objetos REST'''
+    def __init__(self, **kwargs):
+        ## Finaliza la cadena de MRO
+        self.buffer = ''
+    
+    def GET(self, *args):
+        assert not hasattr(super(BaseRestObject, self), 'GET')
+        response = self.buffer
+        self.buffer = ''
+        return response
+    
+    def POST(self, *args):
+        assert not hasattr(super(BaseRestObject, self), 'POST')
+        response = self.buffer
+        self.buffer = ''
+        return response
+        
+    def PUT(self, *args):
+        assert not hasattr(super(BaseRestObject, self), 'PUT')
+        response = self.buffer
+        self.buffer = ''
+        return response
+        
+    def DELETE(self, *args):
+        assert not hasattr(super(BaseRestObject, self), 'DELETE')
+        response = self.buffer
+        self.buffer = ''
+        return response
+
+class RestObject(BaseRestObject):
+    u"""Prototipo de un objeto REST para construir un nodo en el API a través de decorators"""
+    def __init__(self, **kwargs):
         self.get_functions = {}
         self.post_functions = {}
         self.put_functions = {}
@@ -151,9 +181,9 @@ class RestObject(object):
                     self.delete_functions[func[1].type] = func[1]
             except AttributeError:
                 pass 
-        super(RestObject, self).__init__()
+        super(RestObject, self).__init__(**kwargs)
     
-    def GET(self, element=None, type=None):
+    def GET(self, element=None, type=None, *args):
         u"""Devuelve la respuesta al método GET del protocolo HTTP"""
         if(type is None or type == '/'):
             try:
@@ -168,9 +198,10 @@ class RestObject(object):
                 func = self.get_functions[self._prepare_id(type)]
             except KeyError:
                 return # Aquí debe haber un error 404
-        return self._response(func(self._prepare_id(element)))
+        self.buffer += self._response(func(self._prepare_id(element)))
+        return super(RestObject, self).GET(element, type, *args)        
     
-    def POST(self, element=None, type=None):
+    def POST(self, element=None, type=None, *args):
         u"""Devuelve la respuesta al método POST del protocolo HTTP"""
         if(type is None or type == '/'):
             try:
@@ -185,9 +216,10 @@ class RestObject(object):
                 func = self.post_functions[self._prepare_id(type)]
             except KeyError:
                 return # Aquí debe haber un error 404
-        return self._response(func(self._prepare_id(element)))
+        self.buffer += self._response(func(self._prepare_id(element)))
+        return super(RestObject, self).POST(element, type, *args)
     
-    def PUT(self, element=None, type=None):
+    def PUT(self, element=None, type=None, *args):
         u"""Devuelve la respuesta al método PUT del protocolo HTTP"""
         if(type is None or type == '/'):
             try:
@@ -202,9 +234,10 @@ class RestObject(object):
                 func = self.put_functions[self._prepare_id(type)]
             except KeyError:
                 return # Aquí debe haber un error 404
-        return self._response(func(self._prepare_id(element)))
+        self.buffer += self._response(func(self._prepare_id(element)))
+        return super(RestObject, self).PUT(element, type, *args)
     
-    def DELETE(self, element=None, type=None):
+    def DELETE(self, element=None, type=None, *args):
         u"""Devuelve la respuesta al método DELETE del protocolo HTTP"""
         if(type is None or type == '/'):
             try:
@@ -219,7 +252,8 @@ class RestObject(object):
                 func = self.delete_functions[self._prepare_id(type)]
             except KeyError:
                 return # Aquí debe haber un error 404
-        return self._response(func(self._prepare_id(element)))
+        self.buffer += self._response(func(self._prepare_id(element)))
+        return super(RestObject, self).DELETE(element, type, *args)
     
     def _response(self, data):
         u"""Convierte el diccionario proporcionado en una respuesta del tipo JSON"""
