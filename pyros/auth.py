@@ -52,6 +52,22 @@ def auth(secret_key, method='', algorithm = hashlib.sha256):
         return func
     return fauth
 
+def http_auth(credentials):
+    u"""Realiza la autenticación basada en HTTP"""
+    ## Faltan pruebas
+    @base_decorator
+    def fauth(f):
+        def func(*args, **kwargs):
+            auth = web.ctx.env.get('HTTP_AUTHORIZATION')
+            if auth is None:
+                raise AuthError(u"No se autenticó")
+            auth = re.sub('^Basic ', '', auth)
+            username_auth,password_auth = base64.decodestring(auth).split(':')
+            if username_auth == credentials.username and password_auth == credentials.password:
+                return f(*args,**kwargs)
+            else:
+                raise AuthError(u"Autenticación no válida")
+
 class Auth(object):
     u"""Realiza el proceso de autenticación"""
     
