@@ -29,7 +29,6 @@ class Database(object):
     def __init__(self, config):
         u"""Creación de la conexión"""
         self.db = web.database(dbn=config['dbn'], user = config['user'], pw = config['password'], db = config['database'])
-        super(Database, self).__init__()
         
     def get_connection(self):
         u"""Devuelve la conexión activa"""
@@ -56,14 +55,40 @@ class Table(object):
         self.joined = joined
         self.relations = []
         self.suffix = suffix
-        super(Table, self).__init__()
         
     def add_relation(self, tabledata, join_field = None, join_key = None, tag = None):
         self.relations.append({"data": tabledata, "field": join_field, "key": join_key, "tag": tag})
+        
+class BaseModel(object):
+    u'''Clase base para crear modelos derivados y herencia múltiple'''
+    def __init__(self, **kwargs):
+        ## Finaliza el MRO
+        pass
     
-class Model(object):
+    def read(self):
+        assert not hasattr(super(BaseModel, self), 'read')
+    
+    def joined_read(self):
+        assert not hasattr(super(BaseModel, self), 'joined_read')
+    
+    def get(self, id_data):
+        assert not hasattr(super(BaseModel, self), 'get')
+    
+    def joined_get(self, id_data):
+        assert not hasattr(super(BaseModel, self), 'joined_get')
+    
+    def insert(self, values):
+        assert not hasattr(super(BaseModel, self), 'insert')
+    
+    def update(self, id_data, values):
+        assert not hasattr(super(BaseModel, self), 'update')
+    
+    def delete(self, id_data):
+        assert not hasattr(super(BaseModel, self), 'delete')
+    
+class Model(BaseModel):
     u"""Proporciona las operaciones estándar para la base de datos"""
-    def __init__(self, table, primary = 'id', fields = [], suffix = '', _test = False):
+    def __init__(self, table, primary = 'id', fields = [], suffix = '', _test = False, **kwargs):
         u"""Inicializa la conexión y los valores del modelo"""
         if(Database.main is not None):
             self.db = Database.main.get_connection()
@@ -78,7 +103,7 @@ class Model(object):
         self.suffix = suffix
         self._process_fields(fields)        
         self._test = _test
-        super(Model, self).__init__()
+        super(Model, self).__init__(table = table, primary = primary, fields = fields, suffix = suffix, _test = _test, **kwargs)
         
     def _process_fields(self, fields):
         for field in fields:
@@ -103,8 +128,9 @@ class Model(object):
                 str_val = str_val.replace('#s', self.suffix)
         return str_val
                 
-    def read(self, where = None, order = None):
+    def read(self, where = None, order = None, **kwargs):
         u"""Lista de elementos de una tabla"""
+        super(Model, self).read(where=where, order=order, **kwargs)
         if(self.table is None):
             raise DatabaseError(u'No se definió una tabla en el modelo')
         if(self.fields == []): 
@@ -122,8 +148,9 @@ class Model(object):
             rows.append(data)
         return rows
     
-    def joined_read(self, joined, where = None, order = None):
+    def joined_read(self, joined, where = None, order = None, **kwargs):
         u"""Read especial que permite hacer joins entre tablas"""
+        super(Model, self).joined_read(joined=joined, where=where, order=order, **kwargs)
         if(self.table is None):
             raise DatabaseError(u'No se definió una tabla en el modelo')
         if(self.fields == []): 
@@ -156,8 +183,9 @@ class Model(object):
             rows.append(data)
         return rows
     
-    def get(self, id_data):
+    def get(self, id_data, **kwargs):
         u"""Obtiene un registro específico de una tabla"""
+        super(Model, self).get(id_data, **kwargs)
         if(self.table is None):
             raise DatabaseError(u'No se definió una tabla en el modelo')
         if(self.fields == []):
@@ -177,8 +205,9 @@ class Model(object):
         else:
             return {}
         
-    def joined_get(self, id_data, joined):
+    def joined_get(self, id_data, joined, **kwargs):
         u"""Read especial que permite hacer joins entre tablas"""
+        super(Model, self).joined_get(id_data, joined=joined, **kwargs)
         if(self.table is None):
             raise DatabaseError(u'No se definió una tabla en el modelo')
         if(self.fields == []): 
@@ -208,38 +237,61 @@ class Model(object):
         else:
             return {}
     
-    def insert(self, values):
+    def insert(self, values, **kwargs):
         u"""Ingresa un registro a la tabla"""
+        super(Model, self).insert(values, **kwargs)
         vals = []
         for key  in values.keys():
             vals.append( '$'+key )
         query = 'INSERT INTO ' + self.table + ' (' + web.db.sqllist(map(self._get_field, values.keys())) + ') VALUES (' + web.db.sqllist(vals) + ')'
         self.db.query(query, vars=values, _test = self._test)
     
-    def update(self, id_data, values):
+    def update(self, id_data, values, **kwargs):
         u"""Actualiza un registro de la tabla"""
+        super(Model, self).update(id_data, values, **kwargs)
         vals = []
         for key  in values.keys():
             vals.append( self._get_field(key) +' = $'+key )
         query = 'UPDATE ' + self.table + ' SET ' + web.db.sqllist(vals) + ' WHERE `' + self._suffix(self.primary, False) + '` = "' + id_data + '"'
         self.db.query(query, vars=values, _test = self._test)
     
-    def delete(self, id_data):
+    def delete(self, id_data, **kwargs):
         u"""Elimina un registro en la tabla"""
+        super(Model, self).delete(id_data, **kwargs)
         where = self._suffix(self.primary, False) + ' = $id_data'
         self.db.delete(self.table, where=where, vars={'id_data': id_data})
     
 
-class Dataset(object):
+class BaseDataset(object):
+    def __init__(self, **kwargs):
+        ## Fin del MRO
+        pass
+    
+    def add_field(self, field, value, **kwargs):
+        assert not hasattr(super(BaseDataset, self), 'add_field')
+    
+    def get_data(self, id_data, **kwargs):
+        assert not hasattr(super(BaseDataset, self), 'get_data')
+    
+    def insert(self, **kwargs):
+        assert not hasattr(super(BaseDataset, self), 'insert')
+    
+    def update(self, id_data, **kwargs):
+        assert not hasattr(super(BaseDataset, self), 'update')
+    
+    def delete(self, id_data, **kwargs):
+        assert not hasattr(super(BaseDataset, self), 'delete')
+
+class Dataset(BaseDataset):
     u"""Simula un registro en una tabla para poder hacer inserciones y actualizaciones"""
-    def __init__(self, tabledata, json_data=None, index=None):
+    def __init__(self, tabledata, json_data=None, index=None, **kwargs):
         u"""Construye un registro con los datos proporcionados"""        
         self.table = tabledata.table
         self.primary = tabledata.primary
         self.fields = tabledata.fields
         self.suffix = tabledata.suffix
         self.values = {}
-        super(Dataset, self).__init__()
+        super(Dataset, self).__init__(tabledata, json_data, index, **kwargs)
                 
         if(json_data is not None):
             self._load_JSON(json_data, index)
@@ -275,14 +327,16 @@ class Dataset(object):
         u"""Devuelve la lista de campos y datos correspondiente al registro"""
         return self.values
     
-    def add_field(self, field, value):
+    def add_field(self, field, value, **kwargs):
         u"""Agrega un nuevo campo al registro"""
+        super(Dataset, self).add_field(field, value, **kwargs)
         if(not field in self.fields and not (field + '#s') in self.fields):
             self.fields.append(field)
         self.values[field] = value
             
-    def get_data(self, id_data):
+    def get_data(self, id_data, **kwargs):
         u"""Carga la información del registro proporcionado"""
+        super(Dataset, self).get_data(id_data, **kwargs)
         model = Model(self.table, self.primary, self.fields, suffix = self.suffix)
         data = model.get(id_data)
         if(data == {}):
@@ -290,8 +344,9 @@ class Dataset(object):
         self._load_data(data)
         return self._read_data()
         
-    def insert(self):
+    def insert(self, **kwargs):
         u"""Inserta el registro a la tabla proporcionada"""
+        super(Dataset, self).insert(**kwargs)
         if(len(self.values) == 0):
             raise DatasetError(u'Dataset vacío')
         
@@ -299,8 +354,9 @@ class Dataset(object):
         model.insert(self.values)
         return True
     
-    def update(self, id_data, data = ''):
+    def update(self, id_data, data = '', **kwargs):
         u"""Actualiza el registro en la tabla proporcionada"""
+        super(Dataset, self).update(id_data, data=data, **kwargs)
         if(len(self.values) == 0):
             self.get_data(id_data)
         if(data != ''):
@@ -309,12 +365,31 @@ class Dataset(object):
         model.update(id_data, self.values)
         return True
     
-    def delete(self, id_data):
+    def delete(self, id_data, **kwargs):
+        u'''Elimina el registro de la tabla proporcionada'''
+        super(Dataset, self).delete(id_data, **kwargs)
         Model(self.table, self.primary).delete(id_data)
 
-class Datamap(object):
+class BaseDatamap(object):
+    def __init__(self, **kwargs):
+        ## Fin del MRO
+        pass
+    
+    def add_join(self, **kwargs):
+        assert not hasattr(super(BaseDatamap, self), 'add_join')
+       
+    def add_where(self, **kwargs):
+        assert not hasattr(super(BaseDatamap, self), 'add_where')
+        
+    def read(self, **kwargs):
+        assert not hasattr(super(BaseDatamap, self), 'read')
+    
+    def get_element(self, id_element, **kwargs):
+        assert not hasattr(super(BaseDatamap, self), 'get_element')
+
+class Datamap(BaseDatamap):
     u"""Objeto para realizar mapeo de datos"""
-    def __init__(self, tabledata, where=None):
+    def __init__(self, tabledata, where=None, **kwargs):
         u"""Crea un mapa de datos de la tabla proporcionada"""        
         self.table = tabledata.table
         self.primary = tabledata.primary
@@ -326,13 +401,15 @@ class Datamap(object):
         self.joined = tabledata.joined
         self.suffix = tabledata.suffix
         self.model = Model(self.table, self.primary, self.fields, suffix = self.suffix)
-        super(Datamap, self).__init__()
         
         for relation in tabledata.relations:
             self.add_join(Datamap(relation["data"]), relation["field"], relation["key"], relation["tag"])
+            
+        super(Datamap, self).__init__(tabledata=tabledata, where=where, **kwargs)
         
-    def add_join(self, datamap, join_field = None, join_key = None, tag = None):
+    def add_join(self, datamap, join_field = None, join_key = None, tag = None, **kwargs):
         u"""Agrega un submapa a través de llaves foráneas"""
+        super(Datamap, self).add_join(datamap=datamap, join_field=join_field, join_key=join_key, tag=tag, **kwargs)
         if(not isinstance(datamap, Datamap)):
             raise DatabaseError(u'Se agregó un objeto diferente de Datamap al join')
         if(tag is None):
@@ -348,8 +425,9 @@ class Datamap(object):
         u"""Establece una condición de búsqueda"""
         self.where = where
         
-    def add_where(self, field, value = None):
+    def add_where(self, field, value = None, **kwargs):
         u"""Agrega una condición de búsqueda adicional"""
+        super(Datamap, self).add_where(field=field, value=value, **kwargs)
         if(value is None):
             cond = field
         else:
@@ -361,8 +439,9 @@ class Datamap(object):
         else:
             self.where = cond
        
-    def read(self):
+    def read(self, **kwargs):
         u"""Devuelve la lista completa de los elementos del mapa"""
+        super(Datamap, self).read(**kwargs)
         if(self.joined is None):
             main_list = self.model.read(where=self.where)
         else:
@@ -375,8 +454,9 @@ class Datamap(object):
                 setattr(element, sub['tag'], submap.read())
         return main_list
     
-    def get_element(self, id_element):
+    def get_element(self, id_element, **kwargs):
         u"""Devuelve un único elemento en el mapa con el id proporcionado"""
+        super(Datamap, self).get_element(id_element, **kwargs)
         if(self.joined is None):
             data = self.model.get(id_element)
         else:
