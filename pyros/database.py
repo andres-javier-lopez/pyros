@@ -70,31 +70,31 @@ class BaseModel(object):
         ## Finaliza el MRO
         pass
     
-    def read(self):
+    def read(self, **kwargs):
         u"""Finaliza la herencia del método read"""
         assert not hasattr(super(BaseModel, self), 'read')
     
-    def joined_read(self):
+    def joined_read(self, **kwargs):
         u"""Finaliza la herencia del método joined_read"""
         assert not hasattr(super(BaseModel, self), 'joined_read')
     
-    def get(self, id_data):
+    def get(self, id_data, **kwargs):
         u"""Finaliza la herencia del método get"""
         assert not hasattr(super(BaseModel, self), 'get')
     
-    def joined_get(self, id_data):
+    def joined_get(self, id_data, **kwargs):
         u"""Finaliza la herencia del método joined_get"""
         assert not hasattr(super(BaseModel, self), 'joined_get')
     
-    def insert(self, values):
+    def insert(self, values, **kwargs):
         u"""Finaliza la herencia del método insert"""
         assert not hasattr(super(BaseModel, self), 'insert')
     
-    def update(self, id_data, values):
+    def update(self, id_data, values, **kwargs):
         u"""Finaliza la herencia del método update"""
         assert not hasattr(super(BaseModel, self), 'update')
     
-    def delete(self, id_data):
+    def delete(self, id_data, **kwargs):
         u"""Finaliza la herencia del método delete"""
         assert not hasattr(super(BaseModel, self), 'delete')
     
@@ -313,7 +313,7 @@ class Dataset(BaseDataset):
         self.fields = tabledata.fields
         self.suffix = tabledata.suffix
         self.values = {}
-        super(Dataset, self).__init__(tabledata, json_data, index, **kwargs)
+        super(Dataset, self).__init__(tabledata=tabledata, json_data=json_data, index=index, **kwargs)
                 
         if(json_data is not None):
             self._load_JSON(json_data, index)
