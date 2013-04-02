@@ -1,9 +1,8 @@
 #coding: utf-8
 
-'''
+u"""
 @author: Andrés Javier López <ajavier.lopez@gmail.com>
-@version: 
-'''
+"""
 import pyros.database
 import pyros.urlmapper
 

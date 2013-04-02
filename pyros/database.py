@@ -1,21 +1,23 @@
 #coding: utf-8
 
-u"""Operaciones de base de datos."""
-## @copyright: TuApp.net - GNU Lesser General Public License
-## @author: Andrés Javier López <ajavier.lopez@gmail.com>
+u"""Operaciones de base de datos.
+copyright: Klan Estudio 2013 - klanestudio.com 
+license: GNU Lesser General Public License
+author: Andrés Javier López <ajavier.lopez@gmail.com>
+"""
 
 import web
 import json
 
 def check_connection():
-    u"""Comprueba la conexión activa"""
+    u"""Comprueba si la conexión esta activa y devuelve True o False"""
     if(Database.main is None):
         return False
     else:
         return True
 
 class DatabaseError(Exception):
-    u"""Error local de base de datos"""
+    u"""Error estándar de base de datos"""
     pass
 
 class DatasetError(DatabaseError):
@@ -23,15 +25,15 @@ class DatasetError(DatabaseError):
     pass
 
 class Database(object):
-    u"""Conexión general a la base de datos"""
+    u"""Realiza la conexión con la base de datos"""
     main = None
         
     def __init__(self, config):
-        u"""Creación de la conexión"""
+        u"""Crea la conexión con la base de datos"""
         self.db = web.database(dbn=config['dbn'], user = config['user'], pw = config['password'], db = config['database'])
         
     def get_connection(self):
-        u"""Devuelve la conexión activa"""
+        u"""Devuelve un objeto con la conexión a la base de datos"""
         return self.db
     
     @staticmethod
@@ -42,6 +44,7 @@ class Database(object):
 class Table(object):
     u"""Datos generales de una Tabla"""
     def __init__(self, table="", primary="", fields = None, readfields = None, joined = None, suffix=""):
+        u"""Inicializa los datos de la tabla"""
         self.table = table
         self.primary = primary
         if fields is not None:
@@ -57,33 +60,42 @@ class Table(object):
         self.suffix = suffix
         
     def add_relation(self, tabledata, join_field = None, join_key = None, tag = None):
+        u"""Agrega otra tabla como una relación a la tabla existente."""
         self.relations.append({"data": tabledata, "field": join_field, "key": join_key, "tag": tag})
         
 class BaseModel(object):
-    u'''Clase base para crear modelos derivados y herencia múltiple'''
+    u"""Crea modelos derivados y herencia múltiple"""
     def __init__(self, **kwargs):
+        u"""Finaliza la herencia de constructores"""
         ## Finaliza el MRO
         pass
     
     def read(self):
+        u"""Finaliza la herencia del método read"""
         assert not hasattr(super(BaseModel, self), 'read')
     
     def joined_read(self):
+        u"""Finaliza la herencia del método joined_read"""
         assert not hasattr(super(BaseModel, self), 'joined_read')
     
     def get(self, id_data):
+        u"""Finaliza la herencia del método get"""
         assert not hasattr(super(BaseModel, self), 'get')
     
     def joined_get(self, id_data):
+        u"""Finaliza la herencia del método joined_get"""
         assert not hasattr(super(BaseModel, self), 'joined_get')
     
     def insert(self, values):
+        u"""Finaliza la herencia del método insert"""
         assert not hasattr(super(BaseModel, self), 'insert')
     
     def update(self, id_data, values):
+        u"""Finaliza la herencia del método update"""
         assert not hasattr(super(BaseModel, self), 'update')
     
     def delete(self, id_data):
+        u"""Finaliza la herencia del método delete"""
         assert not hasattr(super(BaseModel, self), 'delete')
     
 class Model(BaseModel):
@@ -106,11 +118,13 @@ class Model(BaseModel):
         super(Model, self).__init__(table = table, primary = primary, fields = fields, suffix = suffix, _test = _test, **kwargs)
         
     def _process_fields(self, fields):
+        u"""Reemplaza los sufijos en los campos de la tabla"""
         for field in fields:
             clean = field[:field.find('#s')]
             self.field_keys[clean] = self._suffix(field, False)
             
     def _get_field(self, key):
+        u"""Encuentra el nombre correcto de un campo y lo devuelve como cadena de texto"""
         try:
             field = self.field_keys[key]
         except KeyError:
@@ -118,6 +132,7 @@ class Model(BaseModel):
         return field
         
     def _suffix(self, str_val, alias=True):
+        u"""Aplica el sufijo a una variable y devuelve la cadena de texto de la variable reemplazada"""
         ## No funciona en grupo es necesario aplicarla individualmente a cada campo
         if(str_val is not None):
             if(alias and ' AS ' not in str_val and ' as ' not in str_val):
@@ -129,7 +144,7 @@ class Model(BaseModel):
         return str_val
                 
     def read(self, where = None, order = None, **kwargs):
-        u"""Lista de elementos de una tabla"""
+        u"""Consulta los elementos de la tabla en la base de datos y los devuelve como una lista"""
         super(Model, self).read(where=where, order=order, **kwargs)
         if(self.table is None):
             raise DatabaseError(u'No se definió una tabla en el modelo')
@@ -149,7 +164,7 @@ class Model(BaseModel):
         return rows
     
     def joined_read(self, joined, where = None, order = None, **kwargs):
-        u"""Read especial que permite hacer joins entre tablas"""
+        u"""Consulta los elementos de la tabla leyendo los valores de join y los devuelve como una lista"""
         super(Model, self).joined_read(joined=joined, where=where, order=order, **kwargs)
         if(self.table is None):
             raise DatabaseError(u'No se definió una tabla en el modelo')
@@ -184,7 +199,7 @@ class Model(BaseModel):
         return rows
     
     def get(self, id_data, **kwargs):
-        u"""Obtiene un registro específico de una tabla"""
+        u"""Obtiene un registro específico de una tabla y lo devuelve como un diccionario"""
         super(Model, self).get(id_data, **kwargs)
         if(self.table is None):
             raise DatabaseError(u'No se definió una tabla en el modelo')
@@ -206,7 +221,7 @@ class Model(BaseModel):
             return {}
         
     def joined_get(self, id_data, joined, **kwargs):
-        u"""Read especial que permite hacer joins entre tablas"""
+        u"""Obtiene un registro específico de una tabla junto con sus campos join y lo devuelve como un diccionario"""
         super(Model, self).joined_get(id_data, joined=joined, **kwargs)
         if(self.table is None):
             raise DatabaseError(u'No se definió una tabla en el modelo')
@@ -263,23 +278,30 @@ class Model(BaseModel):
     
 
 class BaseDataset(object):
+    u"""Permite la creación de herencia múltiple de Dataset"""
     def __init__(self, **kwargs):
+        u"""Finaliza la herencia del constructor"""
         ## Fin del MRO
         pass
     
     def add_field(self, field, value, **kwargs):
+        u"""Finaliza la herencia del método add_field"""
         assert not hasattr(super(BaseDataset, self), 'add_field')
     
     def get_data(self, id_data, **kwargs):
+        u"""Finaliza la herencia del método get_data"""
         assert not hasattr(super(BaseDataset, self), 'get_data')
     
     def insert(self, **kwargs):
+        u"""Finaliza la herencia del método insert"""
         assert not hasattr(super(BaseDataset, self), 'insert')
     
     def update(self, id_data, **kwargs):
+        u"""Finaliza la herencia del método update"""
         assert not hasattr(super(BaseDataset, self), 'update')
     
     def delete(self, id_data, **kwargs):
+        u"""Finaliza la herencia del método delete"""
         assert not hasattr(super(BaseDataset, self), 'delete')
 
 class Dataset(BaseDataset):
@@ -299,10 +321,11 @@ class Dataset(BaseDataset):
             self.json_data = {}
             
     def _suffix(self, str_val):
+        u"""Reemplaza el sufijo en la variable proporcionada y la devuelve como una cadena de texto"""
         return str_val.replace('#s', '')
     
     def _load_JSON(self, json_data, index=None):
-        u"""Obtiene datos del registro proporcionados en formato JSON"""
+        u"""Carga los datos del registro proporcionados en formato JSON"""
         try:
             self.json_data = json.loads(json_data)
         except ValueError:
@@ -315,7 +338,7 @@ class Dataset(BaseDataset):
             self._load_data(self.json_data[index])
     
     def _load_data(self, data):
-        u"""Obtiene datos del registro proporcionados en un diccionario"""
+        u"""Carga los datos del registro proporcionados en un diccionario"""
         for field in self.fields:
             try:
                 field = self._suffix(field)
@@ -324,7 +347,7 @@ class Dataset(BaseDataset):
                 pass # Ignoramos si un campo no está entre los datos
             
     def _read_data(self):
-        u"""Devuelve la lista de campos y datos correspondiente al registro"""
+        u"""Devuelve la lista de campos y datos correspondiente al registro en un diccionario"""
         return self.values
     
     def add_field(self, field, value, **kwargs):
@@ -335,7 +358,7 @@ class Dataset(BaseDataset):
         self.values[field] = value
             
     def get_data(self, id_data, **kwargs):
-        u"""Carga la información del registro proporcionado"""
+        u"""Devuelve la información del registro proporcionado como un diccionario"""
         super(Dataset, self).get_data(id_data, **kwargs)
         model = Model(self.table, self.primary, self.fields, suffix = self.suffix)
         data = model.get(id_data)
@@ -371,24 +394,30 @@ class Dataset(BaseDataset):
         Model(self.table, self.primary).delete(id_data)
 
 class BaseDatamap(object):
+    u"""Permite la herencia múltiple de un Datamap"""
     def __init__(self, **kwargs):
+        u"""Finaliza la herencia del constructor"""
         ## Fin del MRO
         pass
     
     def add_join(self, **kwargs):
+        u"""Finaliza la herencia del método add_join"""
         assert not hasattr(super(BaseDatamap, self), 'add_join')
        
     def add_where(self, **kwargs):
+        u"""Finaliza la herencia del método add_where"""
         assert not hasattr(super(BaseDatamap, self), 'add_where')
         
     def read(self, **kwargs):
+        u"""Finaliza la herencia del método read"""
         assert not hasattr(super(BaseDatamap, self), 'read')
     
     def get_element(self, id_element, **kwargs):
+        u"""Finaliza la herencia del método get_element"""
         assert not hasattr(super(BaseDatamap, self), 'get_element')
 
 class Datamap(BaseDatamap):
-    u"""Objeto para realizar mapeo de datos"""
+    u"""Realiza un mapa de los datos de la base"""
     def __init__(self, tabledata, where=None, **kwargs):
         u"""Crea un mapa de datos de la tabla proporcionada"""        
         self.table = tabledata.table
@@ -440,7 +469,7 @@ class Datamap(BaseDatamap):
             self.where = cond
        
     def read(self, **kwargs):
-        u"""Devuelve la lista completa de los elementos del mapa"""
+        u"""Lee los elementos del mapa y los retorna como una lista"""
         super(Datamap, self).read(**kwargs)
         if(self.joined is None):
             main_list = self.model.read(where=self.where)
@@ -455,7 +484,7 @@ class Datamap(BaseDatamap):
         return main_list
     
     def get_element(self, id_element, **kwargs):
-        u"""Devuelve un único elemento en el mapa con el id proporcionado"""
+        u"""Encuentra un elemento único dentro del mapa con el id proporcionado y lo devuelve como un diccionario"""
         super(Datamap, self).get_element(id_element, **kwargs)
         if(self.joined is None):
             data = self.model.get(id_element)

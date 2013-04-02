@@ -1,13 +1,14 @@
 #coding: utf-8
-"""
+u"""
 PyROS - Python REST Operation Server
-Information about the proyect can be found in http://tuapp.net/projects/pyros
+copyright: Klan Estudio 2013 - klanestudio.com 
+license: GNU Lesser General Public License
+author: Andrés Javier López <ajavier.lopez@gmail.com>
 """
-## @copyright: TuApp.net - GNU Lesser General Public License
-## @author: Andrés Javier López <ajavier.lopez@gmail.com>
+
 
 # PyROS version
-__version__ = "0.5"
+__version__ = "1.0"
 
 # PyROS default modules
-__all__ = ["database", "restobject"]
+__all__ = ["database", "restobject", "auth"]

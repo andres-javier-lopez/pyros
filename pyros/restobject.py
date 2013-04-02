@@ -1,8 +1,10 @@
 #coding: utf-8
 
-u"""Objeto base para la creación de apliaciones REST."""
-## @copyright: TuApp.net - GNU Lesser General Public License
-## @author: Andrés Javier López <ajavier.lopez@gmail.com>
+u"""Objeto base para la creación de apliaciones REST.
+copyright: Klan Estudio 2013 - klanestudio.com 
+license: GNU Lesser General Public License
+author: Andrés Javier López <ajavier.lopez@gmail.com>
+"""
 
 import web
 import json
@@ -15,6 +17,7 @@ debug_info = False
 
 @base_decorator
 def get(f):
+    u"""Convierte la función en una petición de tipo GET que devuelve un único elemento"""
     assert(inspect.isfunction(f))
     def func(self, *args, **kwargs):
         return f(self, *args, **kwargs)
@@ -23,6 +26,7 @@ def get(f):
     return func
 
 def get_list(type):
+    u"""Convierte la función en una petición de tipo GET que devuelve una lista de subelementos"""
     assert(not inspect.isfunction(type))
     @base_decorator
     def sub(f):
@@ -36,6 +40,7 @@ def get_list(type):
 
 @base_decorator
 def get_all(f):
+    u"""Convierte la función en una petición de tipo GET que devuelve la lista de todos los elementos"""
     assert(inspect.isfunction(f))
     def func(self, element, *args, **kwargs):
         return f(self, *args, **kwargs)
@@ -45,6 +50,7 @@ def get_all(f):
 
 @base_decorator
 def post(f):
+    u"""Convierte la función en una petición de tipo POST que inserta un elemento a la lista general"""
     assert(inspect.isfunction(f))
     def func(self, element, *args, **kwargs):
         return f(self, *args, **kwargs)
@@ -54,6 +60,7 @@ def post(f):
 
 @base_decorator
 def post_into(f):
+    u"""Convierte la función en una petición de tipo POST que inserta un subelemento dentro de otro elemento"""
     assert(inspect.isfunction(f))
     def func(self, *args, **kwargs):
         return f(self, *args, **kwargs)
@@ -62,6 +69,7 @@ def post_into(f):
     return func
 
 def post_list(type):
+    u"""Convierte la función en una petición de tipo POST que inserta un elemento en una lista específica"""
     assert(not inspect.isfunction(type))
     @base_decorator
     def sub(f):
@@ -74,6 +82,7 @@ def post_list(type):
 
 @base_decorator
 def put_all(f):
+    u"""Convierte la función en una petición de tipo PUT que reemplaza una lista completa de elementos"""
     assert(inspect.isfunction(f))
     def func(self, element, *args, **kwargs):
         return f(self, *args, **kwargs)
@@ -83,6 +92,7 @@ def put_all(f):
 
 @base_decorator
 def put(f):
+    u"""Convierte la función en una petición de tipo PUT que reemplaza un solo elemento"""
     assert(inspect.isfunction(f))
     def func(self, *args, **kwargs):
         return f(self, *args, **kwargs)
@@ -91,6 +101,7 @@ def put(f):
     return func
 
 def put_list(type):
+    u"""Convierte la función en una petición de tipo PUT que reemplaza una lista específica de elementos"""
     assert(not inspect.isfunction(type))
     @base_decorator
     def sub(f):
@@ -104,6 +115,7 @@ def put_list(type):
 
 @base_decorator
 def delete_all(f):
+    u"""Convierte la función en una petición de tipo DELETE que elimina todos los elementos"""
     assert(inspect.isfunction(f))
     def func(self, element, *args, **kwargs):
         return f(self, *args, **kwargs)
@@ -113,6 +125,7 @@ def delete_all(f):
 
 @base_decorator
 def delete(f):
+    u"""Convierte la función en una petición de tipo DELETE que elimina un elemento específico"""
     assert(inspect.isfunction(f))
     def func(self, *args, **kwargs):
         return f(self, *args, **kwargs)
@@ -121,6 +134,7 @@ def delete(f):
     return func
 
 def delete_list(type):
+    u"""Convierte la función en una petición de tipo DELETE que elimina una lista específica de elementos"""
     assert(not inspect.isfunction(type))
     @base_decorator
     def sub(f):
@@ -133,30 +147,35 @@ def delete_list(type):
     return sub
 
 class BaseRestObject(object):
-    u'''Clase base utilizada para permitir herencia múltiple en objetos REST'''
+    u"""Permite la herencia múltiple en objetos REST"""
     def __init__(self, **kwargs):
+        u"""Finaliza la herencia del constructor e inicializa un buffer de salida"""
         ## Finaliza la cadena de MRO
         self.buffer = ''
     
     def GET(self, *args):
+        u"""Finaliza la herencia del método GET y devuelve la respuesta almacenada en el buffer"""
         assert not hasattr(super(BaseRestObject, self), 'GET')
         response = self.buffer
         self.buffer = ''
         return response
     
     def POST(self, *args):
+        u"""Finaliza la herencia del método POST y devuelve la respuesta almacenada en el buffer"""
         assert not hasattr(super(BaseRestObject, self), 'POST')
         response = self.buffer
         self.buffer = ''
         return response
         
     def PUT(self, *args):
+        u"""Finaliza la herencia del método PUT y devuelve la respuesta almacenada en el buffer"""
         assert not hasattr(super(BaseRestObject, self), 'PUT')
         response = self.buffer
         self.buffer = ''
         return response
         
     def DELETE(self, *args):
+        u"""Finaliza la herencia del método DELETE y devuelve la respuesta almacenada en el buffer"""
         assert not hasattr(super(BaseRestObject, self), 'DELETE')
         response = self.buffer
         self.buffer = ''
@@ -165,6 +184,7 @@ class BaseRestObject(object):
 class RestObject(BaseRestObject):
     u"""Prototipo de un objeto REST para construir un nodo en el API a través de decorators"""
     def __init__(self, **kwargs):
+        u"""Recorre la lista de métodos del objeto y los ordena en los métodos GET, POST, PUT y DELETE"""
         self.get_functions = {}
         self.post_functions = {}
         self.put_functions = {}
@@ -256,27 +276,27 @@ class RestObject(BaseRestObject):
         return super(RestObject, self).DELETE(element, type, *args)
     
     def _response(self, data):
-        u"""Convierte el diccionario proporcionado en una respuesta del tipo JSON"""
+        u"""Convierte el diccionario proporcionado en una cadena formateada como JSON"""
         web.header('Content-Type', 'application/json')
         return json.dumps(data)
     
     def _prepare_id(self, string):
-        u"""Procesa el parametro opcional obtenido para que se utilice como id"""
+        u"""Procesa el parametro opcional obtenido para que se utilice como id y lo devuelve como cadena de texto"""
         if string is not None:
             return string.replace('/', '')
         else:
             return string
     
     def _resp(self, tag, data):
-        u"""Le da el formato adecuado a la respuesta que devuelven los métodos"""
+        u"""Le da el formato adecuado a la respuesta que devuelven los métodos y la devuelve como diccionario"""
         return {tag: data}
     
     def _resp_success(self, result):
-        u"""Respuesta estándar para casos de éxito o fallo de un proceso"""
+        u"""Construye una respuesta estándar para casos de éxito o fallo de un proceso y la devuelve como diccionario"""
         return self._resp('success', result)
     
     def _resp_error(self, error_str, debug = ''):
-        u"""Error en caso de excepción"""
+        u"""Construye una respuesta de error en caso de excepción y la devuelve como diccionario"""
         resp = self._resp_success(False)
         resp['error'] = error_str
         if(debug_info):

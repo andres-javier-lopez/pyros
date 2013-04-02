@@ -1,12 +1,14 @@
 #coding: utf-8
 
-u"""Operaciones de base de datos."""
-## @copyright: Klan Estudio - www.klanestudio.com 2013
-## @author: Andrés Javier López <ajavier.lopez@gmail.com>
+u"""Operaciones de base de datos.
+copyright: Klan Estudio 2013 - klanestudio.com 
+license: GNU Lesser General Public License
+author: Andrés Javier López <ajavier.lopez@gmail.com>
+"""
 
 def base_decorator(decorator):
-    '''Decorador base que sirve para guardar correctamente los nombres, documentación y atributos.
-    Sacado de http://wiki.python.org/moin/PythonDecoratorLibrary'''
+    u"""Decorador base que sirve para guardar correctamente los nombres, documentación y atributos.
+    Sacado de http://wiki.python.org/moin/PythonDecoratorLibrary"""
     def new_decorator(f):
         g = decorator(f)
         g.__name__ = f.__name__

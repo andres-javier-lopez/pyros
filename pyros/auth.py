@@ -1,8 +1,10 @@
 #coding: utf-8
 
-u"""Procesos de autenticacion."""
-## @copyright: TuApp.net - GNU Lesser General Public License
-## @author: Andrés Javier López <ajavier.lopez@gmail.com>
+u"""Procesos de autenticación.
+copyright: Klan Estudio 2013 - klanestudio.com 
+license: GNU Lesser General Public License
+author: Andrés Javier López <ajavier.lopez@gmail.com>
+"""
 
 import hashlib, hmac, datetime
 import web
@@ -13,6 +15,7 @@ class AuthError (Exception):
     pass
 
 def auth(secret_key, method='', algorithm = hashlib.sha256):
+    u"""Activa el proceso de autenticación"""
     @base_decorator
     def fauth(f):
         def func(*args, **kwargs):
@@ -50,13 +53,15 @@ def auth(secret_key, method='', algorithm = hashlib.sha256):
     return fauth
 
 class Auth(object):
-    u"""Sistema de autenticación"""
+    u"""Realiza el proceso de autenticación"""
     
     def __init__(self, key, algorithm = hashlib.sha256):
+        u"""Inicializa el objeto"""
         self.key = key
         self.algorithm = algorithm
     
     def is_valid(self, data, hashed, timestamp):
+        u"""Comprueba si el hash es válido y devuelve True o False"""
         if(self.key == ''):
             return True
         
