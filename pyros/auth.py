@@ -55,7 +55,6 @@ class Auth(object):
     def __init__(self, key, algorithm = hashlib.sha256):
         self.key = key
         self.algorithm = algorithm
-        super(Auth, self).__init__()
     
     def is_valid(self, data, hashed, timestamp):
         if(self.key == ''):
