@@ -1,6 +1,6 @@
 #coding: utf-8
 u"""
-PyROS - Python REST Operation Server
+PyROS - Python REST Operation System
 copyright: Klan Estudio 2013 - klanestudio.com 
 license: GNU Lesser General Public License
 author: Andrés Javier López <ajavier.lopez@gmail.com>
