@@ -212,13 +212,16 @@ class RestObject(BaseRestObject):
                 else:
                     func = self.get_functions['_default']
             except KeyError:
-                return # 404
+                return self._404_error()
         else:
             try:
                 func = self.get_functions[self._prepare_id(type)]
             except KeyError:
-                return # Aquí debe haber un error 404
-        self.buffer += self._response(func(self._prepare_id(element)))
+                return self._404_error()
+        try:
+            self.buffer += self._response(func(self._prepare_id(element)))
+        except auth.AuthError:
+            return self._401_error()
         return super(RestObject, self).GET(element, type, *args)        
     
     def POST(self, element=None, type=None, *args):
@@ -230,13 +233,16 @@ class RestObject(BaseRestObject):
                 else:
                     func = self.post_functions['_default']
             except KeyError:
-                return # 404
+                return self._404_error()
         else:
             try:
                 func = self.post_functions[self._prepare_id(type)]
             except KeyError:
-                return # Aquí debe haber un error 404
-        self.buffer += self._response(func(self._prepare_id(element)))
+                return self._404_error()
+        try:
+            self.buffer += self._response(func(self._prepare_id(element)))
+        except auth.AuthError:
+            return self._401_error()
         return super(RestObject, self).POST(element, type, *args)
     
     def PUT(self, element=None, type=None, *args):
@@ -248,13 +254,16 @@ class RestObject(BaseRestObject):
                 else:
                     func = self.put_functions['_default']
             except KeyError:
-                return # 404
+                return self._404_error()
         else:
             try:
                 func = self.put_functions[self._prepare_id(type)]
             except KeyError:
-                return # Aquí debe haber un error 404
-        self.buffer += self._response(func(self._prepare_id(element)))
+                return self._404_error()
+        try:
+            self.buffer += self._response(func(self._prepare_id(element)))
+        except auth.AuthError:
+            return self._401_error()
         return super(RestObject, self).PUT(element, type, *args)
     
     def DELETE(self, element=None, type=None, *args):
@@ -266,13 +275,16 @@ class RestObject(BaseRestObject):
                 else:
                     func = self.delete_functions['_default']
             except KeyError:
-                return # 404
+                return self._404_error()
         else:
             try:
                 func = self.delete_functions[self._prepare_id(type)]
             except KeyError:
-                return # Aquí debe haber un error 404
-        self.buffer += self._response(func(self._prepare_id(element)))
+                return self._404_error()
+        try:
+            self.buffer += self._response(func(self._prepare_id(element)))
+        except auth.AuthError:
+            return self._401_error()
         return super(RestObject, self).DELETE(element, type, *args)
     
     def _response(self, data):
@@ -303,3 +315,12 @@ class RestObject(BaseRestObject):
             resp['debug'] = debug
             traceback.print_exc()
         return resp
+    
+    def _404_error(self):
+        web.ctx.status = '404 Not Found'
+        return 'Error 404 - Page Not Found'
+    
+    def _401_error(self):
+        web.ctx.status = '401 Unauthorized'
+        return 'Error 401 - Unauthorized'
+        
