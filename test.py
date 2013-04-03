@@ -5,6 +5,7 @@ import string
 import time
 import hashlib, hmac
 import json
+from base64 import b64encode
 from pyrostest import tester
 
 url = "http://localhost:8080/"
@@ -17,6 +18,7 @@ class Test(tester.Request):
     def run(self):
         self.restobject_test()
         self.auth_test()
+        self.http_auth_test()
         self.database_test()
         
     def restobject_test(self):
@@ -33,6 +35,14 @@ class Test(tester.Request):
             datastring = unicode(method + u" /auth/?data=áéíóúñ&timestamp=" + timestamp + ' ' + data)
             hash = hmac.new(auth_key, datastring.encode('utf-8'), hashlib.sha256).hexdigest()
             print self._make_request(u"auth/?data=áéíóúñ&timestamp=" + timestamp + '&signature=' + hash, method, body=data)['mensaje']
+            
+    def http_auth_test(self):
+        userAndPass = b64encode(b"hola:mundo").decode("ascii")
+        authString = str('Authorization: Basic ' + userAndPass)
+        headers = [ authString ]
+        for method in self.methods:
+            print self._make_request(u"httpauth/", method, headers=headers)['mensaje']
+            
     
     def database_test(self):
         data = json.dumps({"valor1": u"test_á", "valor2": "5" })

@@ -11,13 +11,16 @@ class Request(object):
         self.c.setopt(pycurl.MAXREDIRS, 5)
         self.methods = ['GET', 'POST', 'PUT', 'DELETE']
     
-    def _make_request(self, url_string, method, body = None):
+    def _make_request(self, url_string, method, body = None, headers = None):
         self._set_request(self.url + urllib2.quote(unicode(url_string).encode('utf-8'), '/?&='))
         self.c.setopt(pycurl.CUSTOMREQUEST, method)
         if(body is not None):
             self.c.setopt(pycurl.POSTFIELDS, body)
         else:
             self.c.setopt(pycurl.POSTFIELDS, "")
+            
+        if headers is not None:
+            self.c.setopt(pycurl.HTTPHEADER, headers)
         
         result = self._get_results()
         try:

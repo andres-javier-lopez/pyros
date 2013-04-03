@@ -87,5 +87,20 @@ credentials = {'username': 'hola', 'password': 'mundo'}
 class HTTPAuth(restobject.RestObject):
     @auth.http_auth(credentials)
     @restobject.get_all
-    def prueba_autenticacion(self):
+    def prueba_autenticacion_get(self):
         return self._resp("mensaje", "autorizado GET por HTTP")
+    
+    @auth.http_auth(credentials)
+    @restobject.post
+    def prueba_autenticacion_post(self):
+        return self._resp("mensaje", "autorizado POST por HTTP")
+    
+    @auth.http_auth(credentials)
+    @restobject.put_all
+    def prueba_autenticacion_put(self):
+        return self._resp("mensaje", "autorizado PUT por HTTP")
+    
+    @auth.http_auth(credentials)
+    @restobject.delete_all
+    def prueba_autenticacion_delete(self):
+        return self._resp("mensaje", "autorizado DELETE por HTTP")
