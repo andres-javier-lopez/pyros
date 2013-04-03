@@ -209,7 +209,7 @@ class Model(BaseModel):
             fields = map(self._suffix, self.fields)
             fields = web.db.sqllist(fields)
         
-        where = self.primary + ' = "' + id_data + '"'
+        where = unicode(self.primary + ' = ' + web.db.sqlquote(id_data))
         result = self.db.select(self.table, what = fields, where = self._suffix(where, False), _test = self._test )
         if(len(result) == 1):
             data = result[0]
@@ -241,7 +241,7 @@ class Model(BaseModel):
         
         table_fields = map(self._suffix, table_fields)
         fields = web.db.sqllist(table_fields)
-        sql = "SELECT " + fields + " FROM " + self.table + join_cond + " WHERE " + self.table + '.' + self._suffix(self.primary, False) + " = '" + id_data + "'"
+        sql = "SELECT " + fields + " FROM " + self.table + join_cond + " WHERE " + self.table + '.' + self._suffix(self.primary, False) + " = " + unicode(web.db.sqlquote(id_data))
         result = self.db.query(sql)
         if(len(result) == 1):
             data = result[0]
@@ -267,7 +267,7 @@ class Model(BaseModel):
         vals = []
         for key  in values.keys():
             vals.append( self._get_field(key) +' = $'+key )
-        query = 'UPDATE ' + self.table + ' SET ' + web.db.sqllist(vals) + ' WHERE `' + self._suffix(self.primary, False) + '` = "' + id_data + '"'
+        query = 'UPDATE ' + self.table + ' SET ' + web.db.sqllist(vals) + ' WHERE `' + self._suffix(self.primary, False) + '` = ' + unicode(web.db.sqlquote(id_data))
         self.db.query(query, vars=values, _test = self._test)
     
     def delete(self, id_data, **kwargs):
@@ -478,7 +478,7 @@ class Datamap(BaseDatamap):
         for element in main_list:
             for sub in self.joins:
                 submap = sub['datamap']
-                where = sub['join_field'] + ' = "' + getattr(element, sub['join_key']).__str__() + '"'
+                where = unicode(sub['join_field'] + ' = ' + web.db.sqlquote(getattr(element, sub['join_key']).__str__()))
                 submap.set_where(where)
                 setattr(element, sub['tag'], submap.read())
         return main_list
@@ -493,7 +493,7 @@ class Datamap(BaseDatamap):
         if(data != {}):
             for sub in self.joins:
                 submap = sub['datamap']
-                where = sub['join_field'] + ' = "' + getattr(data, sub['join_key']).__str__() + '"'
+                where = unicode(sub['join_field'] + ' = ' + web.db.sqlquote(getattr(data, sub['join_key']).__str__()))
                 submap.set_where(where)
                 setattr(data, sub['tag'], submap.read())
         return data
