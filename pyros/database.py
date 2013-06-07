@@ -425,7 +425,8 @@ class Datamap(BaseDatamap):
         self.where = where
         self.joins = []
         self.fields = list(tabledata.fields)
-        self.fields.append(tabledata.primary)
+        if(tabledata.primary != ''):
+            self.fields.append(tabledata.primary)
         self.fields.extend(tabledata.readfields)
         self.joined = tabledata.joined
         self.suffix = tabledata.suffix
