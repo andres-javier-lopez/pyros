@@ -267,8 +267,8 @@ class Model(BaseModel):
         self.db.query(query, vars=values, _test = self._test)
         query = 'SELECT last_insert_id() as id;'
         data = self.db.query(query)
-        id = data[0].id
-        return id
+        id_data = data[0].id
+        return id_data
     
     def update(self, id_data, values, **kwargs):
         u"""Actualiza un registro de la tabla"""
@@ -383,8 +383,8 @@ class Dataset(BaseDataset):
             raise DatasetError(u'Dataset vacío')
         
         model = Model(self.table, self.primary, self.fields, suffix = self.suffix)
-        id = model.insert(self.values)
-        return id
+        id_row = model.insert(self.values)
+        return id_row
     
     def update(self, id_data, data = '', **kwargs):
         u"""Actualiza el registro en la tabla proporcionada"""

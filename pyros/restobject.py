@@ -25,16 +25,16 @@ def get(f):
     func.type = '_default'
     return func
 
-def get_list(type):
+def get_list(type_list):
     u"""Convierte la función en una petición de tipo GET que devuelve una lista de subelementos"""
-    assert(not inspect.isfunction(type))
+    assert(not inspect.isfunction(type_list))
     @base_decorator
     def sub(f):
         assert(inspect.isfunction(f))
         def func(self, *args, **kwargs):
             return f(self, *args, **kwargs)
         func.method = 'GET'
-        func.type = type
+        func.type = type_list
         return func
     return sub
 
@@ -68,15 +68,15 @@ def post_into(f):
     func.type = '_default'
     return func
 
-def post_list(type):
+def post_list(type_list):
     u"""Convierte la función en una petición de tipo POST que inserta un elemento en una lista específica"""
-    assert(not inspect.isfunction(type))
+    assert(not inspect.isfunction(type_list))
     @base_decorator
     def sub(f):
         def func(self, *args, **kwargs):
             return f(self, *args, **kwargs)
         func.method = 'POST'
-        func.type = type
+        func.type = type_list
         return func
     return sub
 
@@ -100,16 +100,16 @@ def put(f):
     func.type = '_default'
     return func
 
-def put_list(type):
+def put_list(type_list):
     u"""Convierte la función en una petición de tipo PUT que reemplaza una lista específica de elementos"""
-    assert(not inspect.isfunction(type))
+    assert(not inspect.isfunction(type_list))
     @base_decorator
     def sub(f):
         assert(inspect.isfunction(f))
         def func(self, *args, **kwargs):
             return f(self, *args, **kwargs)
         func.method = 'PUT'
-        func.type = type
+        func.type = type_list
         return func
     return sub
 
@@ -133,16 +133,16 @@ def delete(f):
     func.type = '_default'
     return func
 
-def delete_list(type):
+def delete_list(type_list):
     u"""Convierte la función en una petición de tipo DELETE que elimina una lista específica de elementos"""
-    assert(not inspect.isfunction(type))
+    assert(not inspect.isfunction(type_list))
     @base_decorator
     def sub(f):
         assert(inspect.isfunction(f))
         def func(self, *args, **kwargs):
             return f(self, *args, **kwargs)
         func.method = 'DELETE'
-        func.type = type
+        func.type = type_list
         return func
     return sub
 
@@ -203,9 +203,9 @@ class RestObject(BaseRestObject):
                 pass 
         super(RestObject, self).__init__(**kwargs)
     
-    def GET(self, element=None, type=None, *args):
+    def GET(self, element=None, type_list=None, *args):
         u"""Devuelve la respuesta al método GET del protocolo HTTP"""
-        if(type is None or type == '/'):
+        if(type_list is None or type_list == '/'):
             try:
                 if(element is None or element == '/'):
                     func = self.get_functions['_all']
@@ -215,7 +215,7 @@ class RestObject(BaseRestObject):
                 return self._404_error()
         else:
             try:
-                func = self.get_functions[self._prepare_id(type)]
+                func = self.get_functions[self._prepare_id(type_list)]
             except KeyError:
                 return self._404_error()
         try:
@@ -224,11 +224,11 @@ class RestObject(BaseRestObject):
             return self._401_error()
         except Exception as e:
             return self._resp_error("An exception ocurred", e.__str__())
-        return super(RestObject, self).GET(element, type, *args)        
+        return super(RestObject, self).GET(element, type_list, *args)        
     
-    def POST(self, element=None, type=None, *args):
+    def POST(self, element=None, type_list=None, *args):
         u"""Devuelve la respuesta al método POST del protocolo HTTP"""
-        if(type is None or type == '/'):
+        if(type_list is None or type_list == '/'):
             try:
                 if(element is None or element == '/'):
                     func = self.post_functions['_all']
@@ -238,7 +238,7 @@ class RestObject(BaseRestObject):
                 return self._404_error()
         else:
             try:
-                func = self.post_functions[self._prepare_id(type)]
+                func = self.post_functions[self._prepare_id(type_list)]
             except KeyError:
                 return self._404_error()
         try:
@@ -247,11 +247,11 @@ class RestObject(BaseRestObject):
             return self._401_error()
         except Exception as e:
             return self._resp_error("An exception ocurred", e.__str__())
-        return super(RestObject, self).POST(element, type, *args)
+        return super(RestObject, self).POST(element, type_list, *args)
     
-    def PUT(self, element=None, type=None, *args):
+    def PUT(self, element=None, type_list=None, *args):
         u"""Devuelve la respuesta al método PUT del protocolo HTTP"""
-        if(type is None or type == '/'):
+        if(type_list is None or type_list == '/'):
             try:
                 if(element is None or element == '/'):
                     func = self.put_functions['_all']
@@ -261,7 +261,7 @@ class RestObject(BaseRestObject):
                 return self._404_error()
         else:
             try:
-                func = self.put_functions[self._prepare_id(type)]
+                func = self.put_functions[self._prepare_id(type_list)]
             except KeyError:
                 return self._404_error()
         try:
@@ -270,11 +270,11 @@ class RestObject(BaseRestObject):
             return self._401_error()
         except Exception as e:
             return self._resp_error("An exception ocurred", e.__str__())
-        return super(RestObject, self).PUT(element, type, *args)
+        return super(RestObject, self).PUT(element, type_list, *args)
     
-    def DELETE(self, element=None, type=None, *args):
+    def DELETE(self, element=None, type_list=None, *args):
         u"""Devuelve la respuesta al método DELETE del protocolo HTTP"""
-        if(type is None or type == '/'):
+        if(type_list is None or type_list == '/'):
             try:
                 if(element is None or element == '/'):
                     func = self.delete_functions['_all']
@@ -284,7 +284,7 @@ class RestObject(BaseRestObject):
                 return self._404_error()
         else:
             try:
-                func = self.delete_functions[self._prepare_id(type)]
+                func = self.delete_functions[self._prepare_id(type_list)]
             except KeyError:
                 return self._404_error()
         try:
@@ -293,7 +293,7 @@ class RestObject(BaseRestObject):
             return self._401_error()
         except Exception as e:
             return self._resp_error("An exception ocurred", e.__str__())
-        return super(RestObject, self).DELETE(element, type, *args)
+        return super(RestObject, self).DELETE(element, type_list, *args)
     
     def _response(self, data):
         u"""Convierte el diccionario proporcionado en una cadena formateada como JSON"""
