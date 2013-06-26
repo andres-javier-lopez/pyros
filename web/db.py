@@ -328,8 +328,9 @@ def sqlify(obj):
         return "'f'"
     elif datetime and isinstance(obj, datetime.datetime):
         return repr(obj.isoformat())
+    elif isinstance(obj, unicode): 
+        return "'" + obj + "'"
     else:
-        if isinstance(obj, unicode): obj = obj.encode('utf8')
         return repr(obj)
 
 def sqllist(lst): 

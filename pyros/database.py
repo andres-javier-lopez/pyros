@@ -470,7 +470,7 @@ class Datamap(BaseDatamap):
         if(value is None):
             cond = field
         else:
-            cond = self.model._get_field(field) + ' = ' + web.db.sqlquote(value)
+            cond = self.model._get_field(field) + ' = ' + web.db.sqlquote(value).__str__()
         
         if(self.where is not None):
             assert(isinstance(self.where, basestring))
