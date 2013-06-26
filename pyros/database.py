@@ -41,6 +41,11 @@ class Database(object):
         u"""Inicializa la configuración de la conexión"""
         Database.main = Database(config)
         
+    @staticmethod
+    def get_static_connection():
+        u"""Devuelve el objeto de la conexión a la base de datos de forma estática"""
+        return Database.main.get_connection()
+        
 class Table(object):
     u"""Datos generales de una Tabla"""
     def __init__(self, table="", primary="", fields = None, readfields = None, joined = None, suffix=""):
