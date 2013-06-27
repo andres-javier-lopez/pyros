@@ -61,24 +61,41 @@ class Basic(restobject.RestObject):
     def prueba_delete_valores(self, elemento):
         return self._resp("mensaje", "borrando los valores de " + elemento)
 
-auth_key = "1234"
+class SimpleAuth1(auth.Auth):
+    def __init__(self):
+        self.key = "1234"
+        
+class SimpleAuth2(auth.Auth):
+    def __init__(self):
+        super(SimpleAuth2, self).__init__("1234")
+
+class SimpleAuth3(auth.Auth):
+    def __init__(self):
+        self.key = "1234"
+        self.algorithm = self.DEFAULT_ALGORITHM
+        
+class SimpleAuth4(auth.Auth):
+    def __init__(self):
+        self.key = "1234"
+        self.algorithm = auth.Auth.DEFAULT_ALGORITHM
+
 class Authenticated(restobject.RestObject):
-    @auth.auth(auth_key)
+    @auth.auth(SimpleAuth1)
     @restobject.get_all
     def prueba_autenticacion(self):
         return self._resp("mensaje", "autorizado GET")
     
-    @auth.auth(auth_key)
+    @auth.auth(SimpleAuth2)
     @restobject.post
     def prueba_auth_post(self):
         return self._resp("mensaje", "autorizado POST")
     
-    @auth.auth(auth_key)
+    @auth.auth(SimpleAuth3)
     @restobject.put_all
     def prueba_auth_put(self):
         return self._resp("mensaje", "autorizado PUT")
     
-    @auth.auth(auth_key)
+    @auth.auth(SimpleAuth4)
     @restobject.delete_all
     def prueba_auth_del(self):
         return self._resp("mensaje", "autorizado DELETE")

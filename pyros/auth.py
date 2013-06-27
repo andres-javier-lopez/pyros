@@ -15,7 +15,37 @@ class AuthError (Exception):
     u"""Error estándar de autenticación"""
     pass
 
-def auth(secret_key, method='', algorithm = hashlib.sha256):
+class Auth(object):
+    u"""Realiza el proceso de autenticación"""
+    
+    DEFAULT_ALGORITHM = hashlib.sha256
+    
+    def __init__(self, key, algorithm = hashlib.sha256):
+        u"""Inicializa el objeto"""
+        self.key = key
+        self.algorithm = algorithm
+        
+    def check_algorithm(self):
+        try:
+            self.algorithm
+        except AttributeError:
+            self.algorithm = Auth.DEFAULT_ALGORITHM
+    
+    def is_valid(self, data, hashed, timestamp):
+        u"""Comprueba si el hash es válido y devuelve True o False"""
+        if(self.key == ''):
+            return True
+        
+        diff = datetime.datetime.utcnow() - datetime.datetime.utcfromtimestamp(float(timestamp))
+        if(diff < datetime.timedelta() or diff > datetime.timedelta(minutes=5)):
+            return False
+        
+        if(hashed == hmac.new(self.key, data.encode('utf-8'), self.algorithm).hexdigest()):
+            return True 
+        else:
+            return False
+
+def auth(authclass, method=''):
     u"""Activa el proceso de autenticación"""
     @base_decorator
     def fauth(f):
@@ -26,8 +56,12 @@ def auth(secret_key, method='', algorithm = hashlib.sha256):
                 timestamp = data.timestamp
             except AttributeError:
                 raise AuthError(u"Falta información de autenticación")
+            
+            if not issubclass(authclass, Auth):
+                raise AuthError(u"Clase de autenticación no válida")
                 
-            authobj = Auth(secret_key, algorithm)
+            authobj = authclass()
+            authobj.check_algorithm()
             
             if(method == ''):
                 try:
@@ -70,25 +104,3 @@ def http_auth(credentials):
                 raise AuthError(u"Autenticación no válida")
         return func
     return fauth
-
-class Auth(object):
-    u"""Realiza el proceso de autenticación"""
-    
-    def __init__(self, key, algorithm = hashlib.sha256):
-        u"""Inicializa el objeto"""
-        self.key = key
-        self.algorithm = algorithm
-    
-    def is_valid(self, data, hashed, timestamp):
-        u"""Comprueba si el hash es válido y devuelve True o False"""
-        if(self.key == ''):
-            return True
-        
-        diff = datetime.datetime.utcnow() - datetime.datetime.utcfromtimestamp(float(timestamp))
-        if(diff < datetime.timedelta() or diff > datetime.timedelta(minutes=5)):
-            return False
-        
-        if(hashed == hmac.new(self.key, data.encode('utf-8'), self.algorithm).hexdigest()):
-            return True 
-        else:
-            return False
