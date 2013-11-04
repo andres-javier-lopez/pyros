@@ -390,13 +390,13 @@ class Dataset(BaseDataset):
         id_row = model.insert(self.values)
         return id_row
     
-    def update(self, id_data, data = '', **kwargs):
+    def update(self, id_data, data = None, **kwargs):
         u"""Actualiza el registro en la tabla proporcionada"""
         super(Dataset, self).update(id_data, data=data, **kwargs)
-        if(len(self.values) == 0):
-            self.get_data(id_data)
-        if(data != ''):
+        if(data is not None):
             self._load_JSON(data)
+        if(len(self.values) == 0):
+            return True
         model = Model(self.table, self.primary, self.fields, suffix = self.suffix)
         model.update(id_data, self.values)
         return True
