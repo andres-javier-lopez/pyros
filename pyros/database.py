@@ -492,7 +492,7 @@ class Datamap(BaseDatamap):
         for element in main_list:
             for sub in self.joins:
                 submap = sub['datamap']
-                where = unicode(sub['join_field'] + ' = ' + web.db.sqlquote(getattr(element, sub['join_key']).__str__()))
+                where = submap.table + '.' + unicode(sub['join_field'] + ' = ' + web.db.sqlquote(getattr(element, sub['join_key']).__str__()))
                 submap.set_where(where)
                 setattr(element, sub['tag'], submap.read())
         return main_list
@@ -507,7 +507,7 @@ class Datamap(BaseDatamap):
         if(data != {}):
             for sub in self.joins:
                 submap = sub['datamap']
-                where = unicode(sub['join_field'] + ' = ' + web.db.sqlquote(getattr(data, sub['join_key']).__str__()))
+                where = submap.table + '.' + unicode(sub['join_field'] + ' = ' + web.db.sqlquote(getattr(data, sub['join_key']).__str__()))
                 submap.set_where(where)
                 setattr(data, sub['tag'], submap.read())
         return data
