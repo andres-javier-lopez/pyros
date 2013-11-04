@@ -164,7 +164,8 @@ class Model(BaseModel):
         for data in result:
             for key in self.fields:
                 key = key.replace('#s', '')
-                setattr(data, key, unicode(getattr(data, key)))
+                if getattr(data,key) is not None:
+                    setattr(data, key, unicode(getattr(data, key)))
             rows.append(data)
         return rows
     
@@ -199,7 +200,8 @@ class Model(BaseModel):
         for data in result:
             for key in self.fields:
                 key = key.replace('#s', '')
-                setattr(data, key, unicode(getattr(data, key)))
+                if getattr(data,key) is not None:
+                    setattr(data, key, unicode(getattr(data, key)))
             rows.append(data)
         return rows
     
@@ -220,7 +222,8 @@ class Model(BaseModel):
             data = result[0]
             for key in self.fields:
                 key = key.replace('#s', '')
-                setattr(data, key, unicode(getattr(data, key)))
+                if getattr(data,key) is not None:
+                    setattr(data, key, unicode(getattr(data, key)))
             return data
         else:
             return {}
@@ -252,7 +255,8 @@ class Model(BaseModel):
             data = result[0]
             for key in self.fields:
                 key = key.replace('#s', '')
-                setattr(data, key, unicode(getattr(data, key)))
+                if getattr(data,key) is not None:
+                    setattr(data, key, unicode(getattr(data, key)))
             return data
         else:
             return {}
