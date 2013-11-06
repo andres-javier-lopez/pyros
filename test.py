@@ -13,7 +13,7 @@ auth_key = "1234"
 
 class Test(tester.Request):
     def __init__(self, url, **kwargs):
-       super(Test, self).__init__(url, **kwargs)
+        super(Test, self).__init__(url, **kwargs)
     
     def run(self):
         self.restobject_test()
@@ -80,7 +80,7 @@ class Test(tester.Request):
         assert(result['elemento']['valor2'] == "7")
         print "verificado reemplazo"
         
-        data = json.dumps({"prueba": "42"})
+        data = json.dumps({"abc": "42"})
         result = self._make_request('test1/' + str(id_result), 'POST', body=data)
         assert(result['success'])
         print "insertado subelemento"
@@ -90,7 +90,7 @@ class Test(tester.Request):
         print "el id del subelemento es " + id_sub
         
         result = self._make_request('test2/' + str(id_sub), 'GET')
-        assert(result['elemento']['prueba'] == "42")
+        assert(result['elemento']['abc'] == "42")
         print "verificado subelemento"
         
         result = self._make_request('test2/' + str(id_sub), 'DELETE')

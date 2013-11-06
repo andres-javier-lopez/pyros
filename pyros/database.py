@@ -125,7 +125,7 @@ class Model(BaseModel):
     def _process_fields(self, fields):
         u"""Reemplaza los sufijos en los campos de la tabla"""
         for field in fields:
-            clean = field[:field.find('#s')]
+            clean = self._clean(field)
             self.field_keys[clean] = self._suffix(field, False)
             
     def _get_field(self, key):
@@ -134,7 +134,26 @@ class Model(BaseModel):
             field = self.field_keys[key]
         except KeyError:
             field = key
-        return field
+        if ' AS ' in field:
+            realfield = field[:field.find(' AS')]
+        elif ' as ' in field:
+            realfield = field[:field.find(' as')]
+        else:
+            realfield = field  
+        return realfield
+    
+    def _clean(self, field):
+        """Obtiene el nombre del campo que se utilizará al manipular los datos"""
+        if 'AS' in field:
+            cleanfield = field[field.find('AS ') + 3:]
+        elif 'as' in field:
+            cleanfield = field[field.find('as ') + 3:]
+        elif '#s' in field:
+            cleanfield = field[:field.find('#s')]
+        else:
+            cleanfield = field        
+        return cleanfield
+        
         
     def _suffix(self, str_val, alias=True):
         u"""Aplica el sufijo a una variable y devuelve la cadena de texto de la variable reemplazada"""
@@ -163,7 +182,7 @@ class Model(BaseModel):
         rows = []
         for data in result:
             for key in self.fields:
-                key = key.replace('#s', '')
+                key = self._clean(key)
                 if getattr(data,key) is not None:
                     setattr(data, key, unicode(getattr(data, key)))
             rows.append(data)
@@ -199,7 +218,7 @@ class Model(BaseModel):
         rows = []
         for data in result:
             for key in self.fields:
-                key = key.replace('#s', '')
+                key = self._clean(key)
                 if getattr(data,key) is not None:
                     setattr(data, key, unicode(getattr(data, key)))
             rows.append(data)
@@ -221,7 +240,7 @@ class Model(BaseModel):
         if(len(result) == 1):
             data = result[0]
             for key in self.fields:
-                key = key.replace('#s', '')
+                key = self._clean(key)
                 if getattr(data,key) is not None:
                     setattr(data, key, unicode(getattr(data, key)))
             return data
@@ -254,7 +273,7 @@ class Model(BaseModel):
         if(len(result) == 1):
             data = result[0]
             for key in self.fields:
-                key = key.replace('#s', '')
+                key = self._clean(key)
                 if getattr(data,key) is not None:
                     setattr(data, key, unicode(getattr(data, key)))
             return data
@@ -333,9 +352,17 @@ class Dataset(BaseDataset):
         else:
             self.json_data = {}
             
-    def _suffix(self, str_val):
+    def _suffix(self, field):
         u"""Reemplaza el sufijo en la variable proporcionada y la devuelve como una cadena de texto"""
-        return str_val.replace('#s', '')
+        if 'AS' in field:
+            cleanfield = field[field.find('AS ') + 3:]
+        elif 'as' in field:
+            cleanfield = field[field.find('as ') + 3:]
+        elif '#s' in field:
+            cleanfield = field[:field.find('#s')]
+        else:
+            cleanfield = field        
+        return cleanfield
     
     def _load_JSON(self, json_data, index=None):
         u"""Carga los datos del registro proporcionados en formato JSON"""
