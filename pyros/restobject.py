@@ -223,7 +223,7 @@ class RestObject(BaseRestObject):
         except auth.AuthError:
             return self._401_error()
         except Exception as e:
-            return self._resp_error("An exception ocurred", e.__str__())
+            return self._response(self._resp_error("An exception ocurred", e.__str__()))
         return super(RestObject, self).GET(element, type_list, *args)        
     
     def POST(self, element=None, type_list=None, *args):
@@ -246,7 +246,7 @@ class RestObject(BaseRestObject):
         except auth.AuthError:
             return self._401_error()
         except Exception as e:
-            return self._resp_error("An exception ocurred", e.__str__())
+            return self._response(self._resp_error("An exception ocurred", e.__str__()))
         return super(RestObject, self).POST(element, type_list, *args)
     
     def PUT(self, element=None, type_list=None, *args):
@@ -269,7 +269,7 @@ class RestObject(BaseRestObject):
         except auth.AuthError:
             return self._401_error()
         except Exception as e:
-            return self._resp_error("An exception ocurred", e.__str__())
+            return self._response(self._resp_error("An exception ocurred", e.__str__()))
         return super(RestObject, self).PUT(element, type_list, *args)
     
     def DELETE(self, element=None, type_list=None, *args):
@@ -292,7 +292,7 @@ class RestObject(BaseRestObject):
         except auth.AuthError:
             return self._401_error()
         except Exception as e:
-            return self._resp_error("An exception ocurred", e.__str__())
+            return self._response(self._resp_error("An exception ocurred", e.__str__()))
         return super(RestObject, self).DELETE(element, type_list, *args)
     
     def _response(self, data):
