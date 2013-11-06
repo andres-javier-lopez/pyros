@@ -30,7 +30,7 @@ class Database(object):
         
     def __init__(self, config):
         u"""Crea la conexión con la base de datos"""
-        self.db = web.database(dbn=config['dbn'], user = config['user'], pw = config['password'], db = config['database'])
+        self.db = web.database(dbn=config['dbn'], host=config['host'], user = config['user'], pw = config['password'], db = config['database'])
         
     def get_connection(self):
         u"""Devuelve un objeto con la conexión a la base de datos"""

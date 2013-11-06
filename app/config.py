@@ -12,7 +12,7 @@ urlmap = pyros.urlmapper.URL()
 urls = urlmap.get_map()
 
 ## Conexión con la base de datos
-database = {'dbn': 'mysql', 'user': 'root', 'password': '', 'database': 'test'}
+database = {'dbn': 'mysql', 'host': 'localhost', 'user': 'root', 'password': '', 'database': 'test'}
 
 ## Depuración desactivada para producción
 debug = False
