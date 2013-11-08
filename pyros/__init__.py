@@ -8,7 +8,7 @@ author: Andrés Javier López <ajavier.lopez@gmail.com>
 
 
 # PyROS version
-__version__ = "1.0"
+__version__ = "1.1.1"
 
 # PyROS default modules
 __all__ = ["database", "restobject", "auth"]
