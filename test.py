@@ -23,7 +23,7 @@ class Test(tester.Request):
         
     def restobject_test(self):
         rand = ''.join(random.choice(string.lowercase + string.digits) for i in range(4))
-        req = ['', rand, rand + '/valores']
+        req = ['', rand, rand + '/valores', rand + '/valores/']
         for r in req:
             for method in self.methods:
                 print self._make_request('basic/' + r, method)['mensaje']
