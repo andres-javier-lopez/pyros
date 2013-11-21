@@ -10,11 +10,15 @@ import pyros.database
 import pyros.urlmapper
 
 urlmap = pyros.urlmapper.URL()
-urlmap.add('/', 'test.restobject.Test')
-urlmap.add('/test/database', 'test.database.Test')
+urlmap.add('/', 'test.simple.Start')
+urlmap.add('/basic', 'test.simple.Basic')
+urlmap.add('/auth', 'test.simple.Authenticated')
+urlmap.add('/httpauth', 'test.simple.HTTPAuth')
+urlmap.add('/test1', 'test.database.Test')
+urlmap.add('/test2', 'test.database.SubTest')
 urls = urlmap.get_map()
 
-database = {'dbn': 'mysql', 'user': 'root', 'password': '', 'database': 'pyros_test'}
+database = {'dbn': 'mysql', 'host': 'localhost', 'user': 'root', 'password': '', 'database': 'pyros_test'}
 
 debug = True
 

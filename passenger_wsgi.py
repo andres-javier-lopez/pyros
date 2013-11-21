@@ -9,6 +9,9 @@ Created on 12/06/2012
 '''
 
 import sys, os
+## Reemplazar con la ruta correcta de python 2.7
+INTERP = "/usr/local/bin/python2.7"
+if sys.executable != INTERP: os.execl(INTERP, INTERP, *sys.argv)
 sys.path.append(os.getcwd())
 
 import web
